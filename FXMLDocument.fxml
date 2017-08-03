@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="javafxapplication1.FXMLDocumentController">
+   <children>
+      <MenuBar layoutY="2.0" prefHeight="29.0" prefWidth="600.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <menus>
+          <Menu fx:id="inputData" mnemonicParsing="false" text="Input" />
+          <Menu fx:id="tab2" mnemonicParsing="false" text="Median Values" />
+          <Menu mnemonicParsing="false" text="Fold Change" />
+            <Menu mnemonicParsing="false" text="ANC Significance" />
+            <Menu mnemonicParsing="false" text="CNA Modules" />
+            <Menu mnemonicParsing="false" text="PCA" />
+            <Menu mnemonicParsing="false" text="Node-Edge Dia" />
+        </menus>
+      </MenuBar>
+      <SplitPane dividerPositions="0.29797979797979796" layoutX="130.0" layoutY="81.0" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="28.0">
+        <items>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="370.0" prefWidth="237.0">
+               <children>
+                  <SplitPane orientation="VERTICAL" prefHeight="370.0" prefWidth="175.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <items>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+                           <children>
+                              <SplitPane dividerPositions="0.30327868852459017" layoutY="67.0" orientation="VERTICAL" prefHeight="368.0" prefWidth="173.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                <items>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="98.0" prefWidth="171.0">
+                                       <children>
+                                          <Text layoutX="8.0" layoutY="13.94921875" strokeType="OUTSIDE" strokeWidth="0.0" text="Select and upload files" wrappingWidth="217.494140625" AnchorPane.leftAnchor="8.0" AnchorPane.rightAnchor="5.505859375" AnchorPane.topAnchor="1.0" />
+                                          <JFXButton fx:id="selectFiles" layoutX="7.0" layoutY="39.0" onAction="#selectFilesEvent" prefHeight="34.0" prefWidth="65.0" stylesheets="@inputData.css" text="Select">
+                                             <font>
+                                                <Font name="System Bold" size="12.0" />
+                                             </font></JFXButton>
+                                          <HBox layoutX="85.0" layoutY="35.0" prefHeight="132.0" prefWidth="142.0" AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="81.0" AnchorPane.rightAnchor="8.0" AnchorPane.topAnchor="35.0">
+                                             <children>
+                                                <ListView fx:id="filesList" prefHeight="200.0" prefWidth="200.0" />
+                                             </children>
+                                          </HBox>
+                                          <JFXButton fx:id="uploadFiles" layoutX="8.0" layoutY="94.0" onAction="#uploadFilesEvent" prefHeight="34.0" prefWidth="65.0" stylesheets="@inputData.css" text="Upload">
+                                             <font>
+                                                <Font name="System Bold" size="12.0" />
+                                             </font>
+                                          </JFXButton>
+                                       </children>
+                                    </AnchorPane>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+                                       <children>
+                                          <VBox prefHeight="273.0" prefWidth="170.0" AnchorPane.leftAnchor="1.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                             <children>
+                                                <TableView fx:id="beadTable" minWidth="-Infinity" prefHeight="273.0" prefWidth="73.0">
+                                                   <columns>
+                                                      <TableColumn fx:id="beadCol" prefWidth="115.0" text="Bead Class" />
+                                                      <TableColumn fx:id="analyteCol" minWidth="8.0" prefWidth="111.0" text="Analyte" />
+                                                   </columns>
+                                                </TableView>
+                                             </children>
+                                          </VBox>
+                                          <TextField fx:id="beadInput" layoutX="12.0" layoutY="281.0" prefHeight="32.0" prefWidth="94.0" promptText="Bead Class" />
+                                          <TextField fx:id="analyteInput" layoutX="121.0" layoutY="281.0" prefHeight="32.0" prefWidth="101.0" promptText="Analyte" />
+                                          <JFXButton fx:id="addBead" layoutX="115.0" layoutY="323.0" onAction="#addBeadEvent" prefHeight="34.0" prefWidth="94.0" stylesheets="@inputData.css" text="Add Bead">
+                                             <font>
+                                                <Font name="System Bold" size="12.0" />
+                                             </font>
+                                          </JFXButton>
+                                          <JFXButton fx:id="cancelBead" layoutX="13.0" layoutY="323.0" onAction="#cancelBeadEvent" prefHeight="34.0" prefWidth="94.0" stylesheets="@inputData.css" text="Cancel">
+                                             <font>
+                                                <Font name="System Bold" size="12.0" />
+                                             </font>
+                                          </JFXButton>
+                                       </children>
+                                    </AnchorPane>
+                                </items>
+                              </SplitPane>
+                           </children>
+                        </AnchorPane>
+                    </items>
+                  </SplitPane>
+               </children>
+            </AnchorPane>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+               <children>
+                  <SplitPane dividerPositions="0.5686619718309859" layoutX="24.0" layoutY="14.0" orientation="VERTICAL" prefHeight="370.0" prefWidth="417.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <items>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+                           <children>
+                              <TabPane layoutY="-19.0" prefHeight="181.0" prefWidth="415.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                <tabs>
+                                  <Tab fx:id="tab1" text="Experiment 1">
+                                    <content>
+                                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="358.0" prefWidth="555.0">
+                                             <children>
+                                                <GridPane fx:id="layoutGrid" layoutY="14.0" prefHeight="291.0" prefWidth="555.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                  <columnConstraints>
+                                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                  </columnConstraints>
+                                                  <rowConstraints>
+                                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                  </rowConstraints>
+                                                   <children>
+                                                      <TextField fx:id="cell1" prefHeight="42.0" prefWidth="42.0" />
+                                                      <TextField fx:id="cell2" prefHeight="42.0" prefWidth="42.0" GridPane.rowIndex="1" />
+                                                      <TextField fx:id="cell3" layoutX="10.0" layoutY="49.0" prefHeight="42.0" prefWidth="42.0" GridPane.rowIndex="2" />
+                                                      <TextField fx:id="cell4" layoutX="10.0" layoutY="88.0" prefHeight="42.0" prefWidth="42.0" GridPane.rowIndex="3" />
+                                                      <TextField fx:id="cell5" prefHeight="42.0" prefWidth="42.0" GridPane.rowIndex="4" />
+                                                      <TextField fx:id="cell6" prefHeight="42.0" prefWidth="42.0" GridPane.rowIndex="5" />
+                                                      <TextField fx:id="seven" prefHeight="42.0" prefWidth="42.0" GridPane.rowIndex="6" />
+                                                      <TextField fx:id="eight" prefHeight="42.0" prefWidth="42.0" GridPane.rowIndex="7" />
+                                                      <TextField fx:id="nine" prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="1" />
+                                                      <TextField fx:id="ten" prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="2" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="2" GridPane.rowIndex="6" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="2" GridPane.rowIndex="7" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="3" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="3" GridPane.rowIndex="4" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="3" GridPane.rowIndex="5" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="3" GridPane.rowIndex="6" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="3" GridPane.rowIndex="7" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="4" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="4" GridPane.rowIndex="1" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="4" GridPane.rowIndex="2" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="4" GridPane.rowIndex="3" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="4" GridPane.rowIndex="4" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="4" GridPane.rowIndex="5" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="4" GridPane.rowIndex="6" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="4" GridPane.rowIndex="7" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="5" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="5" GridPane.rowIndex="1" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="5" GridPane.rowIndex="2" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="5" GridPane.rowIndex="3" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="5" GridPane.rowIndex="4" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="5" GridPane.rowIndex="5" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="5" GridPane.rowIndex="6" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="5" GridPane.rowIndex="7" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="6" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="6" GridPane.rowIndex="1" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="6" GridPane.rowIndex="2" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="6" GridPane.rowIndex="3" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="6" GridPane.rowIndex="4" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="6" GridPane.rowIndex="5" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="6" GridPane.rowIndex="6" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="6" GridPane.rowIndex="7" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="7" GridPane.rowIndex="6" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="7" GridPane.rowIndex="5" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="7" GridPane.rowIndex="4" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="7" GridPane.rowIndex="3" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="8" GridPane.rowIndex="3" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="7" GridPane.rowIndex="2" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="7" GridPane.rowIndex="1" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="7" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="10" GridPane.rowIndex="7" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="10" GridPane.rowIndex="6" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="10" GridPane.rowIndex="5" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="10" GridPane.rowIndex="4" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="10" GridPane.rowIndex="3" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="10" GridPane.rowIndex="2" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="10" GridPane.rowIndex="1" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="10" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="9" GridPane.rowIndex="7" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="9" GridPane.rowIndex="6" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="9" GridPane.rowIndex="5" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="9" GridPane.rowIndex="4" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="9" GridPane.rowIndex="3" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="9" GridPane.rowIndex="2" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="9" GridPane.rowIndex="1" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="9" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="8" GridPane.rowIndex="7" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="8" GridPane.rowIndex="6" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="8" GridPane.rowIndex="5" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="8" GridPane.rowIndex="4" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="8" GridPane.rowIndex="2" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="8" GridPane.rowIndex="1" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="8" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="7" GridPane.rowIndex="7" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="11" GridPane.rowIndex="6" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="11" GridPane.rowIndex="5" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="11" GridPane.rowIndex="4" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="11" GridPane.rowIndex="3" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="11" GridPane.rowIndex="2" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="11" GridPane.rowIndex="1" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="11" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="11" GridPane.rowIndex="7" />
+                                                   </children>
+                                                </GridPane>
+                                             </children>
+                                          </AnchorPane>
+                                    </content>
+                                  </Tab>
+                                  <Tab text="Experiment2">
+                                    <content>
+                                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                                    </content>
+                                  </Tab>
+                                    <Tab fx:id="tab11" text="Experiment 3">
+                                       <content>
+                                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="358.0" prefWidth="555.0">
+                                             <children>
+                                                <GridPane fx:id="layoutGrid1" layoutY="14.0" prefHeight="291.0" prefWidth="555.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                   <columnConstraints>
+                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                                   </columnConstraints>
+                                                   <rowConstraints>
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                   </rowConstraints>
+                                                   <children>
+                                                      <TextField fx:id="cell11" prefHeight="42.0" prefWidth="42.0" />
+                                                      <TextField fx:id="cell21" prefHeight="42.0" prefWidth="42.0" GridPane.rowIndex="1" />
+                                                      <TextField fx:id="cell31" layoutX="10.0" layoutY="49.0" prefHeight="42.0" prefWidth="42.0" GridPane.rowIndex="2" />
+                                                      <TextField fx:id="cell41" layoutX="10.0" layoutY="88.0" prefHeight="42.0" prefWidth="42.0" GridPane.rowIndex="3" />
+                                                      <TextField fx:id="cell51" prefHeight="42.0" prefWidth="42.0" GridPane.rowIndex="4" />
+                                                      <TextField fx:id="cell61" prefHeight="42.0" prefWidth="42.0" GridPane.rowIndex="5" />
+                                                      <TextField fx:id="seven1" prefHeight="42.0" prefWidth="42.0" GridPane.rowIndex="6" />
+                                                      <TextField fx:id="eight1" prefHeight="42.0" prefWidth="42.0" GridPane.rowIndex="7" />
+                                                      <TextField fx:id="nine1" prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="1" />
+                                                      <TextField fx:id="ten1" prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="2" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="2" GridPane.rowIndex="6" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="2" GridPane.rowIndex="7" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="3" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="3" GridPane.rowIndex="4" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="3" GridPane.rowIndex="5" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="3" GridPane.rowIndex="6" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="3" GridPane.rowIndex="7" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="4" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="4" GridPane.rowIndex="1" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="4" GridPane.rowIndex="2" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="4" GridPane.rowIndex="3" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="4" GridPane.rowIndex="4" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="4" GridPane.rowIndex="5" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="4" GridPane.rowIndex="6" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="4" GridPane.rowIndex="7" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="5" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="5" GridPane.rowIndex="1" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="5" GridPane.rowIndex="2" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="5" GridPane.rowIndex="3" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="5" GridPane.rowIndex="4" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="5" GridPane.rowIndex="5" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="5" GridPane.rowIndex="6" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="5" GridPane.rowIndex="7" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="6" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="6" GridPane.rowIndex="1" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="6" GridPane.rowIndex="2" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="6" GridPane.rowIndex="3" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="6" GridPane.rowIndex="4" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="6" GridPane.rowIndex="5" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="6" GridPane.rowIndex="6" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="6" GridPane.rowIndex="7" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="7" GridPane.rowIndex="6" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="7" GridPane.rowIndex="5" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="7" GridPane.rowIndex="4" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="7" GridPane.rowIndex="3" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="8" GridPane.rowIndex="3" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="7" GridPane.rowIndex="2" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="7" GridPane.rowIndex="1" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="7" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="10" GridPane.rowIndex="7" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="10" GridPane.rowIndex="6" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="10" GridPane.rowIndex="5" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="10" GridPane.rowIndex="4" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="10" GridPane.rowIndex="3" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="10" GridPane.rowIndex="2" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="10" GridPane.rowIndex="1" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="10" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="9" GridPane.rowIndex="7" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="9" GridPane.rowIndex="6" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="9" GridPane.rowIndex="5" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="9" GridPane.rowIndex="4" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="9" GridPane.rowIndex="3" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="9" GridPane.rowIndex="2" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="9" GridPane.rowIndex="1" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="9" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="8" GridPane.rowIndex="7" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="8" GridPane.rowIndex="6" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="8" GridPane.rowIndex="5" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="8" GridPane.rowIndex="4" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="8" GridPane.rowIndex="2" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="8" GridPane.rowIndex="1" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="8" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="7" GridPane.rowIndex="7" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="11" GridPane.rowIndex="6" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="11" GridPane.rowIndex="5" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="11" GridPane.rowIndex="4" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="11" GridPane.rowIndex="3" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="11" GridPane.rowIndex="2" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="11" GridPane.rowIndex="1" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="11" />
+                                                      <TextField prefHeight="42.0" prefWidth="42.0" GridPane.columnIndex="11" GridPane.rowIndex="7" />
+                                                   </children>
+                                                </GridPane>
+                                             </children>
+                                          </AnchorPane>
+                                       </content>
+                                    </Tab>
+                                </tabs>
+                              </TabPane>
+                           </children>
+                        </AnchorPane>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="270.0" prefWidth="555.0">
+                           <children>
+                              <Text layoutX="27.0" layoutY="57.0" strokeType="OUTSIDE" strokeWidth="0.0" text="# Sampes" />
+                              <Text layoutX="162.0" layoutY="58.0" strokeType="OUTSIDE" strokeWidth="0.0" text="# Replicates" />
+                              <Text layoutX="23.0" layoutY="27.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Input data here and start analyzing:" />
+                              <TextField fx:id="numSampleInput" layoutX="23.0" layoutY="71.0" prefHeight="25.0" prefWidth="123.0" promptText="Number of samples" />
+                              <TextField fx:id="numReplicaInput" layoutX="162.0" layoutY="71.0" prefHeight="25.0" prefWidth="142.0" promptText="Number of Replicas" />
+                              <Text layoutX="27.0" layoutY="126.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Names" />
+                              <Text layoutX="162.0" layoutY="126.0" strokeType="OUTSIDE" strokeWidth="0.0" text="# of Probes" />
+                              <TextField fx:id="sampleNames" layoutX="23.0" layoutY="130.0" prefHeight="25.0" prefWidth="123.0" promptText="Sample Names" />
+                              <TextField fx:id="numProbeInput" layoutX="162.0" layoutY="130.0" prefHeight="25.0" prefWidth="142.0" promptText="Number of Probes" />
+                              <JFXButton fx:id="checkLayout" layoutX="32.0" layoutY="171.0" onAction="#checkLayoutEvent" prefHeight="34.0" prefWidth="94.0" stylesheets="@inputData.css" text="Check Layout">
+                                 <font>
+                                    <Font name="System Bold" size="12.0" />
+                                 </font>
+                              </JFXButton>
+                              <JFXButton fx:id="analyze" layoutX="182.0" layoutY="171.0" onAction="#analyzeEvent" prefHeight="34.0" prefWidth="94.0" stylesheets="@inputData.css" text="Analyze">
+                                 <font>
+                                    <Font name="System Bold" size="12.0" />
+                                 </font>
+                              </JFXButton>
+                           </children></AnchorPane>
+                    </items>
+                  </SplitPane>
+               </children>
+            </AnchorPane>
+        </items>
+      </SplitPane>
+   </children>
+</AnchorPane>
