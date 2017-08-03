@@ -65,10 +65,10 @@
                                        <children>
                                           <VBox prefHeight="273.0" prefWidth="170.0" AnchorPane.leftAnchor="1.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                              <children>
-                                                <TableView fx:id="beadTable" minWidth="-Infinity" prefHeight="273.0" prefWidth="73.0">
+                                                <TableView fx:id="beadTable" minWidth="-Infinity" prefHeight="273.0" prefWidth="146.0">
                                                    <columns>
                                                       <TableColumn fx:id="beadCol" prefWidth="115.0" text="Bead Class" />
-                                                      <TableColumn fx:id="analyteCol" minWidth="8.0" prefWidth="111.0" text="Analyte" />
+                                                      <TableColumn fx:id="analyteCol" minWidth="8.0" prefWidth="114.0" text="Analyte" />
                                                    </columns>
                                                 </TableView>
                                              </children>
@@ -97,7 +97,7 @@
             </AnchorPane>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                <children>
-                  <SplitPane dividerPositions="0.5686619718309859" layoutX="24.0" layoutY="14.0" orientation="VERTICAL" prefHeight="370.0" prefWidth="417.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <SplitPane dividerPositions="0.448943661971831" layoutX="24.0" layoutY="14.0" orientation="VERTICAL" prefHeight="370.0" prefWidth="417.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <items>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                            <children>
@@ -385,7 +385,7 @@
                               <TextField fx:id="numReplicaInput" layoutX="162.0" layoutY="71.0" prefHeight="25.0" prefWidth="142.0" promptText="Number of Replicas" />
                               <Text layoutX="27.0" layoutY="126.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Names" />
                               <Text layoutX="162.0" layoutY="126.0" strokeType="OUTSIDE" strokeWidth="0.0" text="# of Probes" />
-                              <TextField fx:id="sampleNames" layoutX="23.0" layoutY="130.0" prefHeight="25.0" prefWidth="123.0" promptText="Sample Names" />
+                              <TextField fx:id="sampleNamesInput" layoutX="23.0" layoutY="130.0" prefHeight="25.0" prefWidth="123.0" promptText="Sample Names" />
                               <TextField fx:id="numProbeInput" layoutX="162.0" layoutY="130.0" prefHeight="25.0" prefWidth="142.0" promptText="Number of Probes" />
                               <JFXButton fx:id="checkLayout" layoutX="32.0" layoutY="171.0" onAction="#checkLayoutEvent" prefHeight="34.0" prefWidth="94.0" stylesheets="@inputData.css" text="Check Layout">
                                  <font>
@@ -393,6 +393,24 @@
                                  </font>
                               </JFXButton>
                               <JFXButton fx:id="analyze" layoutX="182.0" layoutY="171.0" onAction="#analyzeEvent" prefHeight="34.0" prefWidth="94.0" stylesheets="@inputData.css" text="Analyze">
+                                 <font>
+                                    <Font name="System Bold" size="12.0" />
+                                 </font>
+                              </JFXButton>
+                              <TableView layoutX="341.0" layoutY="22.0" prefHeight="200.0" prefWidth="200.0">
+                                <columns>
+                                  <TableColumn fx:id="probe" prefWidth="92.0" text="Probe #" />
+                                  <TableColumn fx:id="probeAnalyte" maxWidth="124.0" minWidth="-1.0" prefWidth="107.0" text="Analyte" />
+                                </columns>
+                              </TableView>
+                              <TextField fx:id="probeAnalyteInput" layoutX="446.0" layoutY="231.0" prefHeight="25.0" prefWidth="94.0" promptText="Analyte" />
+                              <TextField fx:id="probleInput" layoutX="343.0" layoutY="231.0" prefHeight="25.0" prefWidth="94.0" promptText="Probe #" />
+                              <JFXButton fx:id="addProbe" layoutX="447.0" layoutY="262.0" onAction="#addProbeEvent" prefHeight="34.0" prefWidth="94.0" stylesheets="@inputData.css" text="Add Probe">
+                                 <font>
+                                    <Font name="System Bold" size="12.0" />
+                                 </font>
+                              </JFXButton>
+                              <JFXButton fx:id="cancelProbe" layoutX="345.0" layoutY="262.0" onAction="#cancelProbeEvent" prefHeight="34.0" prefWidth="94.0" stylesheets="@inputData.css" text="Cancel">
                                  <font>
                                     <Font name="System Bold" size="12.0" />
                                  </font>

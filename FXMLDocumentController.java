@@ -136,17 +136,39 @@ public class FXMLDocumentController implements Initializable {
     private TextField nine1;
     @FXML
     private TextField ten1;
+    @FXML
+    private TextField sampleNamesInput;
     
+    List<String> colors = new ArrayList<>(Arrays.asList("-fx-background-color:blue;", "-fx-background-color:yellow;", "-fx-background-color:red;", "-fx-background-color:pink;", 
+            "-fx-background-color:green;", "-fx-background-color:black;", "-fx-background-color:golden;", "-fx-background-color:purple;", "-fx-background-color:AQUA;",
+            "-fx-background-color:BLUEVIOLET;", "-fx-background-color:#F5F5DC;", "-fx-background-color:BISQUE;", "-fx-background-color:brown;", "-fx-background-color:CORAL;"));
+    @FXML
+    private TableColumn<probeTableData, Integer> probe;
+    @FXML
+    private TableColumn<probeTableData, String> probeAnalyte;
+    @FXML
+    private TextField probeAnalyteInput;
+    @FXML
+    private TextField probleInput;
+    @FXML
+    private JFXButton addProbe;
+    @FXML
+    private JFXButton cancelProbe;
+    
+    @FXML
+    private TableView<probeTableData> probeTable;
+        
         @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
+        // bead table on input tab
         beadCol.setCellValueFactory(new PropertyValueFactory<beadTableData, Integer>("bead"));
 	analyteCol.setCellValueFactory(new PropertyValueFactory<beadTableData,String>("analyte"));
 	beadTable.setItems(beads);
+        
+        //probe table on input tab. 
        
 
-        
-        //cell1. setStyle("-fx-background-color:#38ee00;");
+   
     }    
     
 
@@ -202,81 +224,32 @@ public class FXMLDocumentController implements Initializable {
         numberOfSamples = Integer.parseInt(numSampleInput.getText());
         numberOfReps = Integer.parseInt(numReplicaInput.getText());
         numberOfProbes =  Integer.parseInt(numProbeInput.getText());  
+        String names = sampleNamesInput.getText();
+        String[] nameList = names.split(",");
         int cellsToFill = numberOfSamples * numberOfReps * numberOfProbes;
         cellsList = getCells(layoutGrid);
         int cellsCount =0;
-
-        
-        // List<String> x = new ArrayList<>(Arrays.asList("fx-background-color: white;", "fx-background-color: red;", "fx-background-color: blue;"));
 
         while(cellsCount<cellsToFill)
         {
             for(int i = 0; i<numberOfProbes; i++)
             {
+                String color1 = colors.get(i%colors.size());  
                 for(int j = 0; j<numberOfSamples * numberOfReps; j++)
                 {
-                   // String color1 = colorList.get(cellsCount);
-                   // String color1 = x.get(cellsCount);
-                    //String color1 = y[cellsCount];
-                    cellsList.get(cellsCount).setStyle("-fx-background-color:red;");   
+                    cellsList.get(cellsCount).setStyle(color1);  // set color
+                    cellsList.get(cellsCount).setText(nameList[cellsCount%(nameList.length)] + "." + ((i)%numberOfReps+1)); //set text
                     cellsCount++;
                 }
             }
         }
-    }
-    
-  /*  public String setColor(int colorCode)
-    {
-            String a = "-fx-background-color: rgb(";
-            String b = Integer.toString(colorCode);
-            String c = ",0,0)";
-            String color = new StringBuilder().
-                    append(a).
-                    append(b).
-                    append(c).
-                    toString();
-            return color;
-    }*/
-    
-    public List<String> setColorList()
-    {
-        String a ="fx-background-color: white;" ;
-         String b ="fx-background-color: red;" ;
-        String c ="fx-background-color: blue;" ;
-        List<String> colors = new ArrayList<>();
-        colors.add(a);
-        colors.add(b);
-        colors.add(c);
-        return colors;
 
     }
-    
-    
-   /* public List<Color> setColorList()
+
+    public void displayProbeTable(int number)
     {
-       List<Color> colors = new ArrayList<>();
-        Color a = Color.BLUE;
-        Color b = Color.RED;
-        Color c = Color.GREEN;
-        Color d = Color.PINK;
-        Color e = Color.BLACK;
-        Color f = Color.WHITE;
-        Color g = Color.GRAY; 
-        Color h = Color.YELLOW;
-        //ArrayList<Color> colors = new ArrayList(Arrays.asList(a, b, c,d, e ,f , g, h));
-        colors.add(a);
-        colors.add(b);
-        colors.add(c);
-        colors.add(d); 
-        colors.add(e);
-        colors.add(f);
-        colors.add(g);
-        colors.add(h); 
-           
-        return colors;
+        
     }
-    */
-    
     public List<TextField> getCells(GridPane gridPane)
     {
         List<TextField> cells = new ArrayList<>();
@@ -310,5 +283,15 @@ public class FXMLDocumentController implements Initializable {
     private void analyzeEvent(ActionEvent event) {
     }
 
+    @FXML
+    private void addProbeEvent(ActionEvent event) {
+    }
+
+    @FXML
+    private void cancelProbeEvent(ActionEvent event) {
+    }
+
+
 
 }
+
