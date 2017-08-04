@@ -11,6 +11,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
@@ -24,6 +25,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.Menu;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -107,7 +109,7 @@ public class FXMLDocumentController implements Initializable {
     
     int numberOfSamples;
     int numberOfReps;
-    int numberOfProbes;   
+    int numberOfProbes = 0;   
     List<TextField> cellsList = new ArrayList<>();
     //@FXML
     //List<Color> colorList = new ArrayList<>();
@@ -140,16 +142,12 @@ public class FXMLDocumentController implements Initializable {
     private TextField sampleNamesInput;
     
     List<String> colors = new ArrayList<>(Arrays.asList("-fx-background-color:blue;", "-fx-background-color:yellow;", "-fx-background-color:red;", "-fx-background-color:pink;", 
-            "-fx-background-color:green;", "-fx-background-color:black;", "-fx-background-color:golden;", "-fx-background-color:purple;", "-fx-background-color:AQUA;",
+            "-fx-background-color:green;", "-fx-background-color:orange;", "-fx-background-color:golden;", "-fx-background-color:purple;", "-fx-background-color:AQUA;",
             "-fx-background-color:BLUEVIOLET;", "-fx-background-color:#F5F5DC;", "-fx-background-color:BISQUE;", "-fx-background-color:brown;", "-fx-background-color:CORAL;"));
-    @FXML
-    private TableColumn<probeTableData, Integer> probe;
-    @FXML
-    private TableColumn<probeTableData, String> probeAnalyte;
     @FXML
     private TextField probeAnalyteInput;
     @FXML
-    private TextField probleInput;
+    private TextField probeInput;
     @FXML
     private JFXButton addProbe;
     @FXML
@@ -157,6 +155,12 @@ public class FXMLDocumentController implements Initializable {
     
     @FXML
     private TableView<probeTableData> probeTable;
+    public ObservableList<probeTableData> probeList;
+    @FXML
+    private TableColumn<probeTableData, Integer> probeCol;
+    @FXML
+    private TableColumn<probeTableData, String> probeAnalyteCol;
+
         
         @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -164,14 +168,11 @@ public class FXMLDocumentController implements Initializable {
         beadCol.setCellValueFactory(new PropertyValueFactory<beadTableData, Integer>("bead"));
 	analyteCol.setCellValueFactory(new PropertyValueFactory<beadTableData,String>("analyte"));
 	beadTable.setItems(beads);
-        
+      
         //probe table on input tab. 
-       
-
-   
+        probeCol.setCellValueFactory(new PropertyValueFactory<probeTableData, Integer>("probe"));
+	probeAnalyteCol.setCellValueFactory(new PropertyValueFactory<probeTableData,String>("probeAnalyte"));
     }    
-    
-
 
     @FXML
     private void selectFilesEvent(ActionEvent event) {
@@ -243,13 +244,41 @@ public class FXMLDocumentController implements Initializable {
                 }
             }
         }
-
-    }
-
-    public void displayProbeTable(int number)
-    {
         
+        //set probes values to probe table
+        probeList = generateProbes(numberOfProbes);
+        probeTable.setItems(probeList);
+        probeTable.setRowFactory(tv-> new TableRow<probeTableData>()
+        {
+            @Override
+            protected void updateItem(probeTableData item, boolean empty)
+            {
+                if (item == null)return;
+                Integer n = item.getProbe();
+                int index = Integer.parseInt(n.toString());
+                setStyle(colors.get(index-1));
+            }
+        }
+        );
+               
+        //set colors to probe table rows. 
+        
+
     }
+
+
+    
+    public ObservableList<probeTableData> generateProbes(int n) {
+        ObservableList<probeTableData> allData = FXCollections.observableArrayList();
+        for (int i = 0; i < n; i++) {
+            allData.add(new probeTableData(i+1, "TCR"));
+        }
+        return allData;
+    }
+    
+    
+    
+    
     public List<TextField> getCells(GridPane gridPane)
     {
         List<TextField> cells = new ArrayList<>();
@@ -285,10 +314,22 @@ public class FXMLDocumentController implements Initializable {
 
     @FXML
     private void addProbeEvent(ActionEvent event) {
+    if(probeInput.getText()==null || probeAnalyteInput.getText()==null)
+        {
+            System.out.println("invalid Input!");
+        }
+        probeList.add(new probeTableData(
+            Integer.parseInt(probeInput.getText()),probeAnalyteInput.getText()));
+            probeInput.clear();
+            probeAnalyteInput.clear();
     }
+
+
 
     @FXML
     private void cancelProbeEvent(ActionEvent event) {
+        probeInput.clear();
+        probeAnalyteInput.clear();
     }
 
 
