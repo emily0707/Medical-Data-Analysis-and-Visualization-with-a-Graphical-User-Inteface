@@ -8,6 +8,7 @@ package javafxapplication1;
 import com.jfoenix.controls.JFXButton;
 import java.awt.Color;
 import java.io.File;
+import java.lang.reflect.Array;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -167,8 +168,14 @@ public class FXMLDocumentController implements Initializable {
     private Menu meunMedianValues;
     @FXML
     private AnchorPane exp2AP;
-
-        
+    
+    List<GridPane> expLayouts = new ArrayList<>();
+    List<experimentData> expDatas = new ArrayList<>();
+    List<Tab> expriments = new ArrayList<>();
+    
+    
+    
+    
         @Override
     public void initialize(URL url, ResourceBundle rb) {
         // bead table on input tab
@@ -226,20 +233,66 @@ public class FXMLDocumentController implements Initializable {
                     beadInput.clear();
             analyteInput.clear();
     }
+    
+    @FXML
+    private void addGridLayouts()
+    {
+        expLayouts.add(layoutGrid);
+        expLayouts.add(layoutGrid1);
+
+    }
 
     @FXML
     private void checkLayoutEvent(ActionEvent event) {
-     
+       if(expriments.size()==0)
+        {
+        expLayouts.add(layoutGrid);
+        expLayouts.add(layoutGrid1);
+        expriments.add(tab1);
+        expriments.add(tab2);              
+        }
+
+        
         numberOfSamples = Integer.parseInt(numSampleInput.getText());
         numberOfReps = Integer.parseInt(numReplicaInput.getText());
         numberOfProbes =  Integer.parseInt(numProbeInput.getText());  
         String names = sampleNamesInput.getText();
         String[] nameList = names.split(",");
-        int cellsToFill = numberOfSamples * numberOfReps * numberOfProbes;
-        cellsList = getCells(layoutGrid);
-        //cellsList = getCells(experimentsTabs.getSelectionModel().getSelectedItem().getProperties().equals(AnchorPane));
-        int cellsCount =0;
+        List<String> analytes = new ArrayList<>();
+ 
+        ObservableList<probeTableData> probeList= generateProbes(numberOfProbes);
+        
+        
+        //int index = getSeletedTabIndex();
+             int index=experimentsTabs.getSelectionModel().getSelectedIndex();
+        
+        
+        expDatas.add(new experimentData(numberOfSamples, numberOfReps,nameList,numberOfProbes,probeList ));
+        
+        displayLayout(index, expDatas.get(index));
+        
 
+        
+        
+
+
+    }
+    
+
+
+    
+  private void displayLayout(int index, experimentData data) {
+ //fill textfile
+ numSampleInput.setText(String.valueOf(data.getNumOfSamples()));
+      
+
+
+//fill cells with colors and values base on users' inputs
+        cellsList = getCells(expLayouts.get(index));
+        int cellsCount =0;
+        String[] nameList = data.getNames();
+
+        int cellsToFill = data.getNumOfSamples()*data.getNumOfReplicas()*data.getNumOfProbes();
         while(cellsCount<cellsToFill)
         {
             for(int i = 0; i<numberOfProbes; i++)
@@ -254,8 +307,9 @@ public class FXMLDocumentController implements Initializable {
             }
         }
         
+        
         //set probes values to probe table
-        probeList = generateProbes(numberOfProbes);
+        probeList=data.getProbeList();
         probeTable.setItems(probeList);
         probeTable.setRowFactory(tv-> new TableRow<probeTableData>()
         {
@@ -270,8 +324,18 @@ public class FXMLDocumentController implements Initializable {
         }
         );
 
-    }
+  
+  }
 
+    
+    private int getSeletedTabIndex() {
+        for(int i = 0; i<expriments.size();i++)
+            if(expriments.get(i).isSelected())
+            {
+                return i;
+            }
+        return -1;
+    }
 
     
     public ObservableList<probeTableData> generateProbes(int n) {
@@ -324,8 +388,11 @@ public class FXMLDocumentController implements Initializable {
         {
             System.out.println("invalid Input!");
         }
-        probeList.add(new probeTableData(
+             int index=experimentsTabs.getSelectionModel().getSelectedIndex();
+        expDatas.get(index).updateProbe(new probeTableData(
             Integer.parseInt(probeInput.getText()),probeAnalyteInput.getText()));
+                     
+        
             probeInput.clear();
             probeAnalyteInput.clear();
     }
@@ -340,14 +407,31 @@ public class FXMLDocumentController implements Initializable {
 
     @FXML
     private void changeExperimentEvent(Event event) {
+     int index=experimentsTabs.getSelectionModel().getSelectedIndex();
+     if(expDatas.size()<(index+1))
+        {
         numSampleInput.clear();
         numReplicaInput.clear();
         sampleNamesInput.clear();
         numProbeInput.clear();
         probeTable.getItems().clear();
-        //probeTable.setVisible(false);
+        }
+     else
+     {
+         displayLayout(index, expDatas.get(index));
+     }
+        
+        
+        
+        
+        
+        
+
+      
     
     }
+
+
 
 
 
