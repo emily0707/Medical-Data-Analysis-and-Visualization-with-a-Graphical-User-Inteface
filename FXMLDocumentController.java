@@ -17,6 +17,7 @@ import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -24,11 +25,13 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Menu;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -42,10 +45,6 @@ import javafx.stage.FileChooser.ExtensionFilter;
 public class FXMLDocumentController implements Initializable {
     
     private Label label;
-    @FXML
-    private Menu inputData;
-    @FXML
-    private Menu tab2;
     @FXML
     private JFXButton selectFiles;
     @FXML
@@ -115,8 +114,6 @@ public class FXMLDocumentController implements Initializable {
     //List<Color> colorList = new ArrayList<>();
     List<String> colorList = new ArrayList<>();
     @FXML
-    private Tab tab11;
-    @FXML
     private GridPane layoutGrid1;
     @FXML
     private TextField cell11;
@@ -160,6 +157,16 @@ public class FXMLDocumentController implements Initializable {
     private TableColumn<probeTableData, Integer> probeCol;
     @FXML
     private TableColumn<probeTableData, String> probeAnalyteCol;
+    @FXML
+    private Tab tab2;
+    @FXML
+    private TabPane experimentsTabs;
+    @FXML
+    private Menu menuInput;
+    @FXML
+    private Menu meunMedianValues;
+    @FXML
+    private AnchorPane exp2AP;
 
         
         @Override
@@ -171,7 +178,8 @@ public class FXMLDocumentController implements Initializable {
       
         //probe table on input tab. 
         probeCol.setCellValueFactory(new PropertyValueFactory<probeTableData, Integer>("probe"));
-	probeAnalyteCol.setCellValueFactory(new PropertyValueFactory<probeTableData,String>("probeAnalyte"));
+	probeAnalyteCol.setCellValueFactory(new PropertyValueFactory<probeTableData,String>("analyte"));
+        probeTable.setItems(probeList);
     }    
 
     @FXML
@@ -229,6 +237,7 @@ public class FXMLDocumentController implements Initializable {
         String[] nameList = names.split(",");
         int cellsToFill = numberOfSamples * numberOfReps * numberOfProbes;
         cellsList = getCells(layoutGrid);
+        //cellsList = getCells(experimentsTabs.getSelectionModel().getSelectedItem().getProperties().equals(AnchorPane));
         int cellsCount =0;
 
         while(cellsCount<cellsToFill)
@@ -260,9 +269,6 @@ public class FXMLDocumentController implements Initializable {
             }
         }
         );
-               
-        //set colors to probe table rows. 
-        
 
     }
 
@@ -330,6 +336,17 @@ public class FXMLDocumentController implements Initializable {
     private void cancelProbeEvent(ActionEvent event) {
         probeInput.clear();
         probeAnalyteInput.clear();
+    }
+
+    @FXML
+    private void changeExperimentEvent(Event event) {
+        numSampleInput.clear();
+        numReplicaInput.clear();
+        sampleNamesInput.clear();
+        numProbeInput.clear();
+        probeTable.getItems().clear();
+        //probeTable.setVisible(false);
+    
     }
 
 

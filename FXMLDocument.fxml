@@ -23,8 +23,8 @@
    <children>
       <MenuBar layoutY="2.0" prefHeight="29.0" prefWidth="600.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <menus>
-          <Menu fx:id="inputData" mnemonicParsing="false" text="Input" />
-          <Menu fx:id="tab2" mnemonicParsing="false" text="Median Values" />
+          <Menu fx:id="menuInput" mnemonicParsing="false" text="Input" />
+          <Menu fx:id="meunMedianValues" mnemonicParsing="false" text="Median Values" />
           <Menu mnemonicParsing="false" text="Fold Change" />
             <Menu mnemonicParsing="false" text="ANC Significance" />
             <Menu mnemonicParsing="false" text="CNA Modules" />
@@ -101,7 +101,7 @@
                     <items>
                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                            <children>
-                              <TabPane layoutY="-19.0" prefHeight="181.0" prefWidth="415.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                              <TabPane fx:id="experimentsTabs" layoutY="-19.0" prefHeight="181.0" prefWidth="415.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                 <tabs>
                                   <Tab fx:id="tab1" text="Experiment 1">
                                     <content>
@@ -235,14 +235,9 @@
                                           </AnchorPane>
                                     </content>
                                   </Tab>
-                                  <Tab text="Experiment2">
-                                    <content>
-                                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                                    </content>
-                                  </Tab>
-                                    <Tab fx:id="tab11" text="Experiment 3">
+                                    <Tab fx:id="tab2" onSelectionChanged="#changeExperimentEvent" text="Experiment2">
                                        <content>
-                                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="358.0" prefWidth="555.0">
+                                          <AnchorPane fx:id="exp2AP" minHeight="0.0" minWidth="0.0" prefHeight="358.0" prefWidth="555.0">
                                              <children>
                                                 <GridPane fx:id="layoutGrid1" layoutY="14.0" prefHeight="291.0" prefWidth="555.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                    <columnConstraints>
