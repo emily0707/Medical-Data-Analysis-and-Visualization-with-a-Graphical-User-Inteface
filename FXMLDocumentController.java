@@ -258,10 +258,7 @@ public class FXMLDocumentController implements Initializable {
         numberOfProbes =  Integer.parseInt(numProbeInput.getText());  
         String names = sampleNamesInput.getText();
         String[] nameList = names.split(",");
-        List<String> analytes = new ArrayList<>();
- 
         ObservableList<probeTableData> probeList= generateProbes(numberOfProbes);
-        
         
         //int index = getSeletedTabIndex();
              int index=experimentsTabs.getSelectionModel().getSelectedIndex();
@@ -272,18 +269,11 @@ public class FXMLDocumentController implements Initializable {
         displayLayout(index, expDatas.get(index));
         
 
-        
-        
-
-
     }
     
-
-
     
   private void displayLayout(int index, experimentData data) {
- //fill textfile
- numSampleInput.setText(String.valueOf(data.getNumOfSamples()));
+
       
 
 
@@ -418,6 +408,8 @@ public class FXMLDocumentController implements Initializable {
         }
      else
      {
+          //fill textfile
+ numSampleInput.setText(String.valueOf(expDatas.get(index).getNumOfSamples()));
          displayLayout(index, expDatas.get(index));
      }
         
