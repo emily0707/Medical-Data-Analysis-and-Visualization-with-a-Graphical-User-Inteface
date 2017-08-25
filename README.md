@@ -1,8 +1,8 @@
-## What this program does?
+## 1. What this program does?
 This research aims to provide an intuitive graphical user interface that facilitates the integration of Quantitative Multiplex co-immunoprecipitation (QMI) analyses into end-user labs. Lab technicians will run QMI analysis at ease and get correct results. 
    
    
-## Demo & Features developed
+## 2. Demo & Features developed
 Please note this is an ongoing project.   
 #### ongoing features: 
   - parse xml file get Meidan value using java.   
@@ -18,7 +18,7 @@ Please note this is an ongoing project.
    ![alt text](https://github.com/emily0707/Graphic-user-Interface-for-Cancer-Research/blob/master/images/Picture1.png "Demo ScreenShot")
   
    
-## Challenges/Problems encounterd? 
+## 3. Challenges/Problems encounterd 
 This project deals with large scale datasets, contiunous changes, and integration with diffrent moudules. Challenges I've encoutered are as below: 
 - JavaFX or Java Swing? Why?       
 The key caritieras are flexibility, scalability, and performance. I choose JavaFx beacuase:
