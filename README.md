@@ -13,8 +13,7 @@ Please note this is an ongoing project.
   - User select target xml files for expeirments
   - Editable bead table: They can eaither edit cells or add from a text boxes. 
   - Redesigned the Experiment: One experiements includes 2 probes well. 
-
-- Demo:
+#### Demo:
    ![alt text](https://github.com/emily0707/Graphic-user-Interface-for-Cancer-Research/blob/master/images/Picture1.png "Demo ScreenShot")
   
    
