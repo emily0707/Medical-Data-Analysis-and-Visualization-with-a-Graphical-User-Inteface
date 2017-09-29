@@ -8,24 +8,24 @@ package javafxapplication1;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 
-public class beadTableData {
-	private  SimpleStringProperty bead; 
+public class beadTableData1 {
+	private  SimpleIntegerProperty bead; 
 	private   SimpleStringProperty analyte;
 	
-	public beadTableData(String bead, String analyte) {
+	public beadTableData1(Integer bead, String analyte) {
 		super();
-		this.bead = new SimpleStringProperty(bead);
+		this.bead = new SimpleIntegerProperty(bead);
 		this.analyte = new SimpleStringProperty (analyte);
 	}
-	public String getBead() {
+	public Integer getBead() {
 		return bead.get();
 	}
 	public String getAnalyte() {
 		return analyte.get();
 	}
-        public void setBead(String bead)
+        public void setBead(Integer bead)
         {
-           this.bead = new SimpleStringProperty(bead);
+           this.bead = new SimpleIntegerProperty(bead);
         }
         
         public void setAnalyte(String analyte)

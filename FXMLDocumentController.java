@@ -8,6 +8,7 @@ package javafxapplication1;
 import com.jfoenix.controls.JFXButton;
 import java.awt.Color;
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.net.URL;
 import java.util.ArrayList;
@@ -15,27 +16,40 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Menu;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
+import static javafx.scene.input.KeyCode.S;
+import static javafx.scene.input.KeyCode.T;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Stage;
+import static javax.swing.text.html.HTML.Tag.S;
+import static jdk.nashorn.internal.runtime.regexp.joni.constants.AsmConstants.S;
+import static jdk.nashorn.internal.runtime.regexp.joni.encoding.CharacterType.S;
 
 
 
@@ -55,22 +69,20 @@ public class FXMLDocumentController implements Initializable {
     @FXML
     private JFXButton cancelBead;
     @FXML
-    private TableColumn<beadTableData, Integer> beadCol;
+    private TableColumn<beadTableData, String> beadCol;
     @FXML
     private TableColumn<beadTableData, String> analyteCol;
-    @FXML
     private TextField beadInput;
-    @FXML
     private TextField analyteInput;
     @FXML
     private JFXButton addBead;
     @FXML
-    private TableView<beadTableData> beadTable;
+    public TableView<beadTableData> beadTable;
             ObservableList<beadTableData> beads = FXCollections.observableArrayList(
-			new beadTableData(1, "TCR") ,
-			new beadTableData(5, "CD3") ,
-			new beadTableData(13, "LAT"),
-			new beadTableData(23, "PLC")
+			new beadTableData("1", "TCR") ,
+			new beadTableData("1", "CD3") ,
+			new beadTableData("1", "LAT"),
+			new beadTableData("1", "PLC")
 			);
     @FXML
     private TextField cell2;
@@ -172,6 +184,10 @@ public class FXMLDocumentController implements Initializable {
     List<GridPane> expLayouts = new ArrayList<>();
     List<experimentData> expDatas = new ArrayList<>();
     List<Tab> expriments = new ArrayList<>();
+    @FXML
+    private TextField analyteInput1;
+    @FXML
+    private JFXButton addBead1;
     
     
     
@@ -179,9 +195,14 @@ public class FXMLDocumentController implements Initializable {
         @Override
     public void initialize(URL url, ResourceBundle rb) {
         // bead table on input tab
-        beadCol.setCellValueFactory(new PropertyValueFactory<beadTableData, Integer>("bead"));
+        beadCol.setCellValueFactory(new PropertyValueFactory<beadTableData, String>("bead"));
 	analyteCol.setCellValueFactory(new PropertyValueFactory<beadTableData,String>("analyte"));
 	beadTable.setItems(beads);
+        //set text filed to columns so that they can be edited. 
+        beadCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        analyteCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        
+
       
         //probe table on input tab. 
         probeCol.setCellValueFactory(new PropertyValueFactory<probeTableData, Integer>("probe"));
@@ -212,20 +233,20 @@ public class FXMLDocumentController implements Initializable {
         
     }
 
-    @FXML
-    private void uploadFilesEvent(ActionEvent event) {
-    }
+
 
     @FXML
     private void addBeadEvent(ActionEvent event) {
-        if(beadInput.getText()==null || analyteInput.getText()==null)
-        {
-            System.out.println("invalid Input!");
-        }
-        beads.add(new beadTableData(
-            Integer.parseInt(beadInput.getText()),analyteInput.getText()));
-            beadInput.clear();
-            analyteInput.clear();
+        try {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("addBeads.fxml"));
+                Parent root1 = (Parent) fxmlLoader.load();
+                Stage stage = new Stage();
+                stage.setScene(new Scene(root1));  
+                stage.show();
+        } catch(Exception e) {
+           e.printStackTrace();
+          }
+
     }
 
     @FXML
@@ -234,7 +255,6 @@ public class FXMLDocumentController implements Initializable {
             analyteInput.clear();
     }
     
-    @FXML
     private void addGridLayouts()
     {
         expLayouts.add(layoutGrid);
@@ -291,7 +311,7 @@ public class FXMLDocumentController implements Initializable {
                 for(int j = 0; j<numberOfSamples * numberOfReps; j++)
                 {
                     cellsList.get(cellsCount).setStyle(color1);  // set color
-                    cellsList.get(cellsCount).setText(nameList[cellsCount%(nameList.length)] + "." + ((i)%numberOfReps+1)); //set text
+                    cellsList.get(cellsCount).setText(nameList[cellsCount%(nameList.length)] + "." + ((j)/numberOfSamples+1)); //set text
                     cellsCount++;
                 }
             }
@@ -397,32 +417,55 @@ public class FXMLDocumentController implements Initializable {
 
     @FXML
     private void changeExperimentEvent(Event event) {
-     int index=experimentsTabs.getSelectionModel().getSelectedIndex();
-     if(expDatas.size()<(index+1))
+        int index=experimentsTabs.getSelectionModel().getSelectedIndex();
+        if(expDatas.size()<(index+1))
+           {
+           numSampleInput.clear();
+           numReplicaInput.clear();
+           sampleNamesInput.clear();
+           numProbeInput.clear();
+           probeTable.getItems().clear();
+           }
+        else
         {
-        numSampleInput.clear();
-        numReplicaInput.clear();
-        sampleNamesInput.clear();
-        numProbeInput.clear();
-        probeTable.getItems().clear();
-        }
-     else
-     {
-          //fill textfile
- numSampleInput.setText(String.valueOf(expDatas.get(index).getNumOfSamples()));
-         displayLayout(index, expDatas.get(index));
-     }
-        
-        
-        
-        
-        
-        
-
-      
-    
+             //fill textfile
+            numSampleInput.setText(String.valueOf(expDatas.get(index).getNumOfSamples()));
+            displayLayout(index, expDatas.get(index));
+        }   
     }
 
+
+
+    @FXML
+    private void uploadFilesEvent(ActionEvent event) {
+    }
+
+
+
+    @FXML
+    private void editBeadFileEvent(ActionEvent event) throws IOException {
+       // Runtime rt = Runtime.getRuntime();
+        //String path = javafxapplication1.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+       // String file = "C:\\Users\\feiping\\Documents\\NetBeansProjects\\JavaFXApplication1\\src\\javafxapplication1\\beads.txt";
+       // Process p = rt.exec("notepad" + file);
+        
+        ProcessBuilder pb = new ProcessBuilder("Notepad.exe", "C:\\Users\\feiping\\Documents\\NetBeansProjects\\JavaFXApplication1\\src\\javafxapplication1\\beads.txt");
+        pb.start();
+        
+    }
+
+    @FXML
+    // set bead class cloumn editable 
+    private void changeBeadEvent(CellEditEvent<beadTableData, String> edittedCell) {
+        beadTableData beadSeleted= beadTable.getSelectionModel().getSelectedItem();
+        beadSeleted.setBead(edittedCell.getNewValue());
+    }
+
+    @FXML
+    private void changeBeadAnalyte(CellEditEvent<beadTableData, String> edittedCell) {
+        beadTableData beadSeleted= beadTable.getSelectionModel().getSelectedItem();
+        beadSeleted.setAnalyte(edittedCell.getNewValue());
+    }
 
 
 
