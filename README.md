@@ -28,7 +28,7 @@ The key caritieras are flexibility, scalability, and performance. I choose JavaF
 
 #### 2. Integration with different modules
   There are a lot of modules working together. the analysis processes run on a R program, a Matlab program and an excel file.    
-  After seraching related documents online, I figured out how to call R and Matlab program from Java. Analysis using excel will be programmed into R or Java and intergrated into the GUI project.     
+  After seraching related documents online, we figured out how to call R and Matlab program from Java. Analysis using excel will be programmed into R or Java and intergrated into the GUI project.     
   - Solution for calling R from Java:     
   Using JRI to call R from Java. Intall rJava(includes JRI) in RStudio. Add JRI libarary jars into Java project properties.    
   - Solution for calling MATLAB from Java:     
