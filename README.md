@@ -1,18 +1,11 @@
 ## 1. What this program does?
-This research aims to provide an intuitive graphical user interface that facilitates the integration of Quantitative Multiplex co-immunoprecipitation (QMI) analyses into end-user labs. Lab technicians will run QMI analysis at ease and get correct results. 
+This research aims to provide an improved Quantitative Multiplex co-immunoprecipitation (QMI) analyses platform. 
+The exisiting QMI analyses involves run a R program and a Matlab Program and manual speedsheet operation. This project will integrate different modules into a Java program and provide an intuiative graphical user interface(GUI) to present visual data results. With no knowledge in coding, a lab technician will run QMI analysis at ease and get visualized results. 
+
    
    
 ## 2. Demo & Features developed
 Please note this is an ongoing project.   
-#### ongoing features: 
-  - parse xml file get Meidan value using java.   
-#### Finished features: 
-  - Display experiment setting base on users' inputs sing different color and content. 
-  - Users can edit beads list through a txt file. 
-  - Display Probes table information base on users' inputs using different color and content. 
-  - User select target xml files for expeirments
-  - Editable bead table: They can eaither edit cells or add from a text boxes. 
-  - Redesigned the Experiment: One experiements includes 2 probes well. 
 #### Demo:
    ![alt text](https://github.com/emily0707/Graphic-user-Interface-for-Cancer-Research/blob/master/images/Picture1.png "Demo ScreenShot")
   
