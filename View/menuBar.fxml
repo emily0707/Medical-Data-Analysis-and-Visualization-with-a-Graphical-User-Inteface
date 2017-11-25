@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+
+<MenuBar xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.111" fx:controller="Controller.MenuBarController">
+        <menus>
+          <Menu fx:id="input" mnemonicParsing="false" 
+                onAction="#switchToInput" text="Input" />
+          <Menu fx:id="medianValue" mnemonicParsing="false" 
+                onAction="#switchToMedianValue" text="Median Values" />
+          <Menu fx:id="FoldChange" mnemonicParsing="false" onAction="#switchToFoldChange" text="Fold Change" />
+            <Menu fx:id="ANC" mnemonicParsing="false" onAction="#switchToANC" text="ANC Significance" />
+            <Menu fx:id="CNA" mnemonicParsing="false" onAction="#switchToCNA" text="CNA Modules" />
+            <Menu fx:id="PCA" mnemonicParsing="false" onAction="#switchToPCA" text="PCA" />
+            <Menu fx:id="NED" mnemonicParsing="false" onAction="#switchToNED" text="Node-Edge Dia" />
+        </menus>
+
+    
+</MenuBar>
