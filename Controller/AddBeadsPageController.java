@@ -5,6 +5,7 @@
  */
 package Controller;
 
+import Util.StAXParser;
 import Model.BeadsModel;
 import Model.bead;
 import Model.ModelForProbeTabe;

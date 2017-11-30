@@ -21,7 +21,7 @@ import javafx.scene.layout.BorderPane;
  *
  * @author feiping
  */
-public class MenuBarController implements Initializable {
+public class MenuBarController implements Initializable{
 
     @FXML
     private Menu input;
@@ -41,18 +41,18 @@ public class MenuBarController implements Initializable {
     /**
      * Initializes the controller class.
      */
-    @Override
+   @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
     }    
 
     @FXML
-    private void switchToInput(ActionEvent event) {
+    public void switchToInput(ActionEvent event) {
 
     }
 
     @FXML
-     void switchToMedianValue(ActionEvent event) {
+    public void switchToMedianValue(ActionEvent event) {
              try {
       
       URL medianValueURL = getClass().getResource("/View/MedianValue.fxml");
@@ -67,23 +67,23 @@ public class MenuBarController implements Initializable {
     }
 
     @FXML
-    private void switchToFoldChange(ActionEvent event) {
+    public void switchToFoldChange(ActionEvent event) {
     }
 
     @FXML
-    private void switchToANC(ActionEvent event) {
+    public void switchToANC(ActionEvent event) {
     }
 
     @FXML
-    private void switchToCNA(ActionEvent event) {
+    public void switchToCNA(ActionEvent event) {
     }
 
     @FXML
-    private void switchToPCA(ActionEvent event) {
+    public void switchToPCA(ActionEvent event) {
     }
 
     @FXML
-    private void switchToNED(ActionEvent event) {
+    public void switchToNED(ActionEvent event) {
     }
     
 }

@@ -5,6 +5,7 @@
  */
 package Controller;
 
+import Util.StAXParser;
 import Model.UserInputForBeadPlate;
 import Model.bead;
 import Model.probeTableData;
@@ -203,9 +204,6 @@ public class HomepageController implements Initializable {
     private TextField nine1;
     @FXML
     private TextField ten1;
-
-//ObservableList<probeTableData> testdata =  FXCollections.observableArrayList();
-
         
         
     @Override
@@ -213,10 +211,6 @@ public class HomepageController implements Initializable {
         String filePath = "C:\\Appling\\CS Master\\Capstone\\AnalysiswithM\\110614_SEE3.xml";
         StAXParser parser = new StAXParser();
         beads =  parser.getBeads(filePath);
-
-        
-       // probeTableData data1 = new probeTableData(1, "test");
-//testdata.add(data1);
 
         // set beads data into bead class List table. 
         beadCol.setCellValueFactory(new PropertyValueFactory<bead,String>("RegionNumber"));
@@ -280,10 +274,7 @@ public class HomepageController implements Initializable {
         {
             ModelForProbeTabe.getInstance().addExperiement(Integer.valueOf(count));
         }
-        
-        //set 1st experiment as default current experiement
-        //Context.getInstance().setCurrentExperiement("1");
-        
+       
         //after user clieck expriements from the choice box, Change experiment info
         DropdownExperimentsChoiceBox.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent e) {
