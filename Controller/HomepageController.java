@@ -94,6 +94,7 @@ public class HomepageController implements Initializable {
     private Text currentExperiementNumber;
     @FXML
     private Text XMLfilesNames;
+    private int curExperiment;
  
     // user input area for plate1  and plate 2. 
     @FXML
@@ -114,6 +115,10 @@ public class HomepageController implements Initializable {
     private TextField sampleNamesInput2;
     @FXML
     private JFXButton checkLayout;
+    
+    //List<UserInputForBeadPlate> userInputsForBeadPlate = new ArrayList<>(); // list for user input data
+    HashMap<Integer, List<UserInputForBeadPlate>> userInputsForBeadPlateMap= new HashMap<>();
+
    
 // bead plates tab area, use for display proble layout 
     @FXML
@@ -126,6 +131,13 @@ public class HomepageController implements Initializable {
     private GridPane beadPlate1Layout;
     @FXML
     private GridPane beadPlate2Layout;
+    List<GridPane> beadPlateLayouts = new ArrayList<>(); // list for layout gridPane     
+    List<Tab> beadPlates = new ArrayList<>(); // list for bead plate tabs 
+    List<TextField> layoutCellsList = new ArrayList<>(); // List to hold textfield in each gridpane cells. 
+    //colors list for set diffrent colors to each probe
+    List<String> colors = new ArrayList<>(Arrays.asList("-fx-background-color:blue;", "-fx-background-color:yellow;", "-fx-background-color:red;", "-fx-background-color:pink;", 
+            "-fx-background-color:green;", "-fx-background-color:orange;", "-fx-background-color:golden;", "-fx-background-color:purple;", "-fx-background-color:AQUA;",
+            "-fx-background-color:BLUEVIOLET;", "-fx-background-color:#F5F5DC;", "-fx-background-color:BISQUE;", "-fx-background-color:brown;", "-fx-background-color:CORAL;"));
     
 //probe table area    
     @FXML
@@ -150,60 +162,12 @@ public class HomepageController implements Initializable {
     private JFXButton analyze;
 
 //Below are elements used for displaying probe layout in bead plates.     
-//colors list for set diffrent colors to each probe
-    List<String> colors = new ArrayList<>(Arrays.asList("-fx-background-color:blue;", "-fx-background-color:yellow;", "-fx-background-color:red;", "-fx-background-color:pink;", 
-            "-fx-background-color:green;", "-fx-background-color:orange;", "-fx-background-color:golden;", "-fx-background-color:purple;", "-fx-background-color:AQUA;",
-            "-fx-background-color:BLUEVIOLET;", "-fx-background-color:#F5F5DC;", "-fx-background-color:BISQUE;", "-fx-background-color:brown;", "-fx-background-color:CORAL;"));
-    List<GridPane> beadPlateLayouts = new ArrayList<>(); // list for layout gridPane 
-    List<UserInputForBeadPlate> userInputsForBeadPlate = new ArrayList<>(); // list for user input data
-    List<Tab> beadPlates = new ArrayList<>(); // list for bead plate tabs 
-    List<TextField> layoutCellsList = new ArrayList<>();
+
     @FXML
     private Menu menuInput;
     @FXML
     private Menu meunMedianValues;
-    @FXML
-    private TextField cell1;
-    @FXML
-    private TextField cell2;
-    @FXML
-    private TextField cell3;
-    @FXML
-    private TextField cell4;
-    @FXML
-    private TextField cell5;
-    @FXML
-    private TextField cell6;
-    @FXML
-    private TextField seven;
-    @FXML
-    private TextField eight;
-    @FXML
-    private TextField nine;
-    @FXML
-    private TextField ten;
-    @FXML
-    private AnchorPane exp2AP;
-    @FXML
-    private TextField cell11;
-    @FXML
-    private TextField cell21;
-    @FXML
-    private TextField cell31;
-    @FXML
-    private TextField cell41;
-    @FXML
-    private TextField cell51;
-    @FXML
-    private TextField cell61;
-    @FXML
-    private TextField seven1;
-    @FXML
-    private TextField eight1;
-    @FXML
-    private TextField nine1;
-    @FXML
-    private TextField ten1;
+
         
         
     @Override
@@ -285,6 +249,121 @@ public class HomepageController implements Initializable {
             }
         });
     }
+    
+        // event for user select different experiement,
+    //display user input data and bead layout for that experiement base on the data stored for the experiment. 
+    // if no data, leave blank user input and empty bead layout. 
+    @FXML
+    private void changeExperimentEvent(Event event) {
+        //after user clieck expriements from the choice box, Change experiment info       
+        DropdownExperimentsChoiceBox.setOnAction(new EventHandler<ActionEvent>() {
+            @Override public void handle(ActionEvent e) {
+                Integer newValue = DropdownExperimentsChoiceBox.getSelectionModel().getSelectedItem();
+                curExperiment = (int)newValue -1;
+                currentExperiementNumber.setText(Integer.toString(newValue));  
+                XMLfilesNames.setText(fileNames.get(newValue*2 -2) + "," +  fileNames.get(newValue*2 -1));
+                ModelForProbeTabe.getInstance().setCurrentExperiment( newValue -1 ); // set current experiment in model for proble table
+            }
+        });
+        
+        //if the experiement already has data, show data 
+        if(userInputsForBeadPlateMap.get(curExperiment)!=null)
+        {
+            displayUserInput(userInputsForBeadPlateMap.get(curExperiment));
+            displayBeadsPlateLayout(curExperiment);
+        }        
+        //has no data submited, display empty user input area and empty beads plate table. 
+        else 
+        {
+            clearUserInput();
+            clearLayout();
+            //clearBeadsPlateLayout();
+
+        }
+        
+        /*
+        int index = beadPlatesTab.getSelectionModel().getSelectedIndex();
+        if(userInputsForBeadPlate .size()<(index+1))
+           {
+           numSampleInput.clear();
+           numReplicaInput.clear();
+           sampleNamesInput.clear();
+           numProbeInput.clear();
+           probeTable1.getItems().clear();
+           probeTable2.getItems().clear();
+           }
+        else
+        {
+             //fill textfile
+            numSampleInput.setText(String.valueOf(userInputsForBeadPlate .get(index).getNumOfSamples()));
+            displayLayout(index, userInputsForBeadPlate .get(index));
+        }   
+*/
+    }
+    
+    //helper fucntionf for chaning experiment
+    // when no data at cur experiement, clear userinput area.
+    private void clearUserInput()
+    {
+        //clear bead plate1 
+        // consider use getChildren.clear() 
+        numSampleInput.clear();
+        numReplicaInput.clear();
+        sampleNamesInput.clear();
+        numProbeInput.clear();
+        sampleNamesInput.clear();
+        
+        //clear bead plate2
+        numSampleInput2.clear();
+        numReplicaInput2.clear();
+        sampleNamesInput2.clear();
+        numProbeInput2.clear();
+        sampleNamesInput2.clear();
+    }
+    
+    //helper function for changing experiment
+    //when no user inputs for this experiment, clear bead plate layout.
+    private void clearBeadsPlateLayout()
+    {
+        String[] emptyNameList = {};
+        List<String> emptyProbeList = new ArrayList<>();
+        UserInputForBeadPlate empty = new UserInputForBeadPlate(0,0,"", emptyNameList,0,emptyProbeList);
+        for(int i = 0; i <beadPlateLayouts.size(); i++)
+        {
+            displayLayout(i,empty);
+        }
+    }
+    
+       private void clearLayout()
+   {
+       for(int i = 0; i < beadPlateLayouts.size();i++)
+       {
+           layoutCellsList = getCells(beadPlateLayouts .get(i));
+           for(int j =0; j <layoutCellsList.size(); j++)
+           {
+               layoutCellsList.get(j).clear();
+               layoutCellsList.get(j).setStyle("-fx-background-color:white;");
+           }
+       }
+   }
+    
+    // helper function for change experiment
+    // show data in the user input area base on previous user input stored in the map.
+    private void displayUserInput(List<UserInputForBeadPlate> data) {
+        //update user input for bead plate 1
+        numSampleInput.setText(Integer.toString(data.get(0).getNumOfSamples()));
+        numReplicaInput.setText(Integer.toString(data.get(0).getNumOfSamples()));
+        numProbeInput.setText(Integer.toString(data.get(0).getNumOfProbes()));
+        sampleNamesInput.setText(data.get(0).getNameInput());
+        
+        //update user Input for bead Plate2
+        numSampleInput2.setText(Integer.toString(data.get(1).getNumOfSamples()));
+        numReplicaInput2.setText(Integer.toString(data.get(1).getNumOfSamples()));
+        numProbeInput2.setText(Integer.toString(data.get(1).getNumOfProbes()));
+        sampleNamesInput2.setText(data.get(1).getNameInput());
+        
+    }
+
    
     //open a pop-up page to edit beads
     private void addBeadEvent(ActionEvent event) {
@@ -307,15 +386,12 @@ public class HomepageController implements Initializable {
     }
     
     
-    private void addGridLayouts()
-    {
-        beadPlateLayouts.add(beadPlate1Layout);
-        beadPlateLayouts.add(beadPlate2Layout);
-    }
+
 
     //for display layout button. click to diaplay bead plate layout on each bead plate tab. 
     @FXML
     private void checkLayoutEvent(ActionEvent event) {
+        
        if(beadPlates.size()==0)
         {
         beadPlateLayouts.add(beadPlate1Layout);
@@ -323,7 +399,8 @@ public class HomepageController implements Initializable {
         beadPlates.add(beadPlate1Tab);
         beadPlates.add(beadPlate2Tab);              
         }
-       
+       //clearLayout();
+        List<UserInputForBeadPlate> userInputsForBeadPlate = new ArrayList<>();
        //gather user inputs for bead plate1 form each text fileds 
         int numberOfSamples = Integer.parseInt(numSampleInput.getText());
         int numberOfReps = Integer.parseInt(numReplicaInput.getText());
@@ -333,9 +410,9 @@ public class HomepageController implements Initializable {
        // ObservableList<probeTableData> probeList= generateProbes(numberOfProbes); 
         List<String> probeList = new ArrayList<>();
         //combine user inputs and probeList into a UserInputForBeadPlate object
-        userInputsForBeadPlate.add(new UserInputForBeadPlate(numberOfSamples, numberOfReps,nameList,numberOfProbes,probeList ));
-        
-        
+        userInputsForBeadPlate.add(new UserInputForBeadPlate(numberOfSamples, numberOfReps,names, nameList,
+                numberOfProbes,probeList ));
+
         //gather user inputs for bead plate2 for each text fileds 
         int numberOfSamples2 = Integer.parseInt(numSampleInput2.getText());
         int numberOfReps2 = Integer.parseInt(numReplicaInput2.getText());
@@ -344,20 +421,28 @@ public class HomepageController implements Initializable {
         String[] nameList2 = names.split(",");
         List<String> probeList2 = new ArrayList<>();
                
-        //generate probe list base on users input for # of probes
-       // ObservableList<probeTableData> probeList2= generateProbes(numberOfProbes2); 
         //combine user inputs and probeList into a UserInputForBeadPlate object
-        userInputsForBeadPlate.add(new UserInputForBeadPlate(numberOfSamples2, numberOfReps2,nameList2,numberOfProbes2,probeList2 ));
-        
-        //get index of current bead plate, pass index and userinput and probelist to display layout 
-        //int index=beadPlatesTab.getSelectionModel().getSelectedIndex(); 
-        for(int i =0; i <beadPlateLayouts.size();i++ )
-        {
-            displayLayout(i, userInputsForBeadPlate.get(i));
-        }
-        
+        userInputsForBeadPlate.add(new UserInputForBeadPlate(numberOfSamples2, numberOfReps2,names2, nameList2,
+                numberOfProbes2,probeList2 ));
+        //find current experiment, put the experiement into the map associated with curexperiment number. 
+        userInputsForBeadPlateMap.put(curExperiment, userInputsForBeadPlate);
+       // userInputsForBeadPlate.clear();
+                
+        curExperiment = Integer.parseInt(currentExperiementNumber.getText()) - 1;
+        displayBeadsPlateLayout(curExperiment);
         //create probe table datas for popolating data in probe table. 
         //displayProbeTable();
+    }
+    
+    //get data of current experiement and display the bead plate layout. 
+    private void displayBeadsPlateLayout(int curExperiment)
+    {
+        if(userInputsForBeadPlateMap.get(curExperiment) == null) return;
+        for(int i =0; i <userInputsForBeadPlateMap.get(curExperiment).size();i++ )
+        {
+            displayLayout(i, userInputsForBeadPlateMap.get(curExperiment).get(i));
+        }
+        
     }
 /*    
 private void displayProbeTable() {
@@ -371,7 +456,7 @@ private void displayProbeTable() {
 }*/
 
 
-   
+
     //display layout in the gridpane
     // index: index of the bead plate 
     //data: user input data for that bead plate   
@@ -465,25 +550,7 @@ private void displayProbeTable() {
 
 
 
-    @FXML
-    private void changeExperimentEvent(Event event) {
-        int index=beadPlatesTab.getSelectionModel().getSelectedIndex();
-        if(userInputsForBeadPlate .size()<(index+1))
-           {
-           numSampleInput.clear();
-           numReplicaInput.clear();
-           sampleNamesInput.clear();
-           numProbeInput.clear();
-           probeTable1.getItems().clear();
-           probeTable2.getItems().clear();
-           }
-        else
-        {
-             //fill textfile
-            numSampleInput.setText(String.valueOf(userInputsForBeadPlate .get(index).getNumOfSamples()));
-            displayLayout(index, userInputsForBeadPlate .get(index));
-        }   
-    }
+
 
 
 
@@ -560,6 +627,7 @@ private void displayProbeTable() {
         }
         return res;
     }
+
 
 
 }

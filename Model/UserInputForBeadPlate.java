@@ -16,16 +16,19 @@ import javafx.collections.ObservableList;
 public class UserInputForBeadPlate {
     private int  numberOfSamples;
     private  int numberOfReplicas;
+    private String namesInput;
     private  String[] names;
     private  int numberOfProbes;
     private  List<String> probeList;
+
     
-    public  UserInputForBeadPlate(int samples, int replicas, String[] names, 
+    public  UserInputForBeadPlate(int samples, int replicas, String namesInput, String[] names, 
             int probes, List<String> probeList)
     {
         super();
         this.numberOfSamples=samples;
         this.numberOfReplicas=replicas;
+        this.namesInput=namesInput;
         this.names=names;
         this.numberOfProbes=probes;
         this.probeList=probeList;
@@ -34,7 +37,6 @@ public class UserInputForBeadPlate {
     
     public void updateProbe(String newProbe)
     {
-        //this.numberOfProbes++;
         this.probeList.add(newProbe);       
     }
     
@@ -47,7 +49,10 @@ public class UserInputForBeadPlate {
     {
         return this.numberOfReplicas;
     }
-    
+    public String getNameInput()
+    {
+        return this.namesInput;
+    }
     public String[] getNames()
     {
         return this.names;
