@@ -14,9 +14,9 @@ public class probeTableData {
     private  SimpleStringProperty probeForPlate;
 
 
-    public probeTableData(Integer probe, String probeForPlate) {
+    public probeTableData(Integer probeCount, String probeForPlate) {
             super();
-            this.probeCount = new SimpleIntegerProperty(probe);
+            this.probeCount = new SimpleIntegerProperty(probeCount);
             this.probeForPlate = new SimpleStringProperty(probeForPlate);         
     }
 

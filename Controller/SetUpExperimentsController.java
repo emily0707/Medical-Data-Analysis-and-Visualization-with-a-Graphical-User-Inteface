@@ -9,10 +9,12 @@ import Model.ModelForExperiments;
 import Model.ModelForExperiments;
 import Model.XMLFile;
 import Model.bead;
+import Model.probeTableData;
 import Util.ErrorMsg;
 import Util.StAXParser;
 import java.net.URL;
 import java.util.ArrayList;
+import static java.util.Collections.list;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,10 +67,10 @@ public class SetUpExperimentsController implements Initializable {
     private Text numberOfExperimentsText;
     @FXML
     private Text curExperimentText;
-    private int curExperiment;
-    ObservableList<String> allXMLfiles = FXCollections.observableArrayList() ;
-    
-    ObservableList<String> XMLFilesForOneExperiment =FXCollections.observableArrayList ();
+    private int curExperiment = -1; // -1 means no experiment has been choosen 
+    ObservableList<String> allXMLfiles = FXCollections.observableArrayList(); // for all xml files    
+    ObservableList<String> XMLFilesForOneExperiment =FXCollections.observableArrayList (); // for selected xml files
+
     @FXML
     private ListView<String> filesForOneExperimentListView;
     Map<Integer, ObservableList<String>> map = new HashMap<>(); // to hold xml files info for each experiment
@@ -86,7 +88,9 @@ public class SetUpExperimentsController implements Initializable {
         xmlFilesListView.setItems(allXMLfiles);
         
         filesForOneExperimentListView.setItems(XMLFilesForOneExperiment);
-        ModelForExperiments.getInstance().setExperimentsMap(new HashMap<Integer, List<String>>()); // clear previous data set up for experiments   
+        //ModelForExperiments.getInstance().setExperimentsMap(new HashMap<Integer, List<String>>()); // clear previous data set up for experiments   
+        
+        
         chooseExperimentChoiceBox.getSelectionModel().selectedIndexProperty().addListener(this::itemChanged);
     }    
     
@@ -97,6 +101,15 @@ public class SetUpExperimentsController implements Initializable {
         curExperimentText.setText(String.valueOf(curExperiment));
         //clear previous data in list view for one experiemnt. 
         XMLFilesForOneExperiment.clear();
+        // display previous data from user input. 
+        Map<Integer, List<String>> XMLFileMap = ModelForExperiments.getInstance().getExperimentsXMLFileMap();
+        List<String> previousXMLfiles = ModelForExperiments.getInstance().getExperimentsXMLFileMap().get(curExperiment);
+        if(previousXMLfiles.size()!=0)
+        {
+            for(String s: previousXMLfiles)
+                XMLFilesForOneExperiment.add(s);            
+        }
+
      }
 
     // update number of experiments and create empty list for each expriments. 
@@ -104,27 +117,68 @@ public class SetUpExperimentsController implements Initializable {
     @FXML
     private void setNumberofExperimentsEvent(ActionEvent event) {
         int number = Integer.parseInt(numberOfExperiments.getText());
+        int preNumberOfExperiment = ModelForExperiments.getInstance().getNumberOfExperiments();
         numberOfExperimentsText.setText(String.valueOf(number));
         ModelForExperiments.getInstance().setNumberOfExperiments(number);
-        //// set experiments to choice box. 
+        //set experiments to choice box. 
+        ModelForExperiments.getInstance().getProbeListForPopulate().clear();
         List<Integer> counts = new ArrayList<Integer>();
             for(int i = 1; i <=number; i++)
             {
                 counts.add(i);
+            } 
+        experiments = FXCollections.observableList(counts);
+        ModelForExperiments.getInstance().setExperiments(experiments);// put it into model for homepage display
+        chooseExperimentChoiceBox.setItems(experiments); 
+        
+        ModelForExperiments.getInstance().initilizeProbeListForPopulate();// update probe lists
+
+        // if new number of experiment less than previous input, remove extra experiment data. 
+        if(number < preNumberOfExperiment)
+        {
+            for(int i = number+1; i<=preNumberOfExperiment; i++)
+            {
+                ModelForExperiments.getInstance().getExperimentsXMLFileMap().remove(i);
+            }
+        }
+        // if new nubmer of experiment more than previous input, add empty list into the data. 
+        else if (number > preNumberOfExperiment)
+        {
+            for(int i = preNumberOfExperiment+1; i<=number; i++)
+            {
                 ModelForExperiments.getInstance().getExperimentsXMLFileMap().put(i, new ArrayList<String>());
             }
-            experiments = FXCollections.observableList(counts);
-            ModelForExperiments.getInstance().setExperiments(experiments);
-            chooseExperimentChoiceBox.setItems(experiments); 
+        }
+            Map<Integer, List<String>> XMLFileMap  = ModelForExperiments.getInstance().getExperimentsXMLFileMap();
+             List<String> XMLfiles = ModelForExperiments.getInstance().getExperimentsXMLFileMap().get(number);
+       
+               
+       
+      
+             
+        //set defalut experiment to 1 
+        int defaultExperiment = 1;
+        chooseExperimentChoiceBox.setValue(defaultExperiment);
+        curExperimentText.setText(String.valueOf(defaultExperiment));
     }
 
     @FXML
     private void addXmlFileEvent(ActionEvent event) {
        String file =  xmlFilesListView.getSelectionModel().getSelectedItem();
-       if(XMLFilesForOneExperiment.size()==0)
+       if(curExperiment == -1)
+       {
+            ErrorMsg error = new ErrorMsg();
+            error.showError("choose an experiment to add File !" );                   
+       }
+       else if(XMLFilesForOneExperiment.size()==0 )
        {
            XMLFilesForOneExperiment.add(file);
            ModelForExperiments.getInstance().getExperimentsXMLFileMap().get(curExperiment).add(file);
+       }
+       else if(XMLFilesForOneExperiment.contains(file))
+       {
+            ErrorMsg error = new ErrorMsg();
+            error.showError("File " + file + " already choosen!");           
        }
        else if(ModelForExperiments.getInstance().getExperimentsXMLFileMap().get(curExperiment).size()>=3)
        {
@@ -135,6 +189,7 @@ public class SetUpExperimentsController implements Initializable {
        {
            XMLFilesForOneExperiment.add(file);
            ModelForExperiments.getInstance().getExperimentsXMLFileMap().get(curExperiment).add(file);
+           //ModelForExperiments.getInstance().seXMLfileListForOneExperiment(curExperiment, XMLFilesForOneExperiment);
        }
             
     }

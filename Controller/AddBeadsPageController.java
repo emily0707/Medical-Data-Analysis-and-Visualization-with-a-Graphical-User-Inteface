@@ -6,9 +6,11 @@
 package Controller;
 
 import Util.StAXParser;
-import Model.BeadsModel;
+import Model.ModelForExperiments;
 import Model.bead;
 import Model.ModelForProbeTabe;
+import Model.probeTableData;
+import Util.ErrorMsg;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -20,6 +22,7 @@ import javafx.stage.Stage;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TreeTableColumn;
@@ -35,91 +38,158 @@ import javafx.scene.layout.AnchorPane;
  */
 //controller for beads editing pop-up page.
 public class AddBeadsPageController implements Initializable {
-    @FXML
-    private Button addBeadsBtn;
-    @FXML
-    private Button deleteAnalyteFromExp;
-    @FXML
-    private AnchorPane addBeadsPage;
-    @FXML
-    TableView<bead> beadsListTable;
 
-    @FXML
-    private TableColumn<bead, String> beadClassCol;
-    @FXML
-    private TableColumn<bead, String> analyteCol;
-    @FXML
-    private TableView<bead> experimentBeadsTable;
-    ObservableList<bead> experimentBeads = FXCollections.observableArrayList();
     
     @FXML
-    private TableColumn<bead, String> experimentBeadClassCol;
+    private TableView<probeTableData> probeTable;
     @FXML
-    private TableColumn<bead, String> experimentAnalyteCol;
+    private TableColumn<probeTableData, Integer> probeNoCol;
+    @FXML
+    private TableColumn<probeTableData, String> probeNameCol;
+    ObservableList<probeTableData> probes = FXCollections.observableArrayList(); // list to holds all probes 
     
-    private  ObservableList<bead> allBeads; 
-    public  ObservableList<bead> slectedBeads = FXCollections.observableArrayList();
+    @FXML
+    private Button addBeadsBtn;    
+    @FXML
+    private TableView<probeTableData> experimentProbeTable;
+    @FXML
+    private TableColumn<probeTableData, Integer> experimentProbeNoCol;
+    @FXML
+    private TableColumn<probeTableData, String> experimentProbeNameCol;    
+    public  ObservableList<probeTableData> slectedProbes = FXCollections.observableArrayList(); //list for selected probes
 
-    public BeadsModel BeadsModel = new BeadsModel();
+
     @FXML
-    private Label testSqlite;
+    private Button Delete;
     @FXML
-    private Button updateExperimentBeads;
+    private Button moveUpBtn;
+    @FXML
+    private Button moveDownBtn;
+    
+    int curExperiment;
+    int curPlate;
+    int probeSize;
+
+
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
        
-        ObservableList<bead> beadsfromXML = FXCollections.observableArrayList();
-        String filePath = "C:\\Appling\\CS Master\\Capstone\\AnalysiswithM\\110614_SEE3.xml";
-        StAXParser parser = new StAXParser();
-        beadsfromXML =  parser.getBeads(filePath);
-  
-        // set beads data into bead class List table. 
-        beadClassCol.setCellValueFactory(new PropertyValueFactory<bead,String>("RegionNumber"));
-        analyteCol.setCellValueFactory(new PropertyValueFactory<bead,String>("Analyte"));
-        beadsListTable.setItems(beadsfromXML);
+        probes = ModelForExperiments.getInstance().getProbesForLoad();
+
+        probeNoCol.setCellValueFactory(new PropertyValueFactory<probeTableData,Integer>("probeCount"));
+        probeNameCol.setCellValueFactory(new PropertyValueFactory<probeTableData,String>("probeForPlate"));
+        probeTable.setItems(probes);
     
         // set experiement bead data into experiement bead table
-        experimentBeadClassCol.setCellValueFactory(new PropertyValueFactory<bead,String>("RegionNumber"));
-        experimentAnalyteCol.setCellValueFactory(new PropertyValueFactory<bead,String>("Analyte"));
-        experimentBeadsTable.setItems(experimentBeads);
+        curExperiment = ModelForExperiments.getInstance().getCurrentExperiment();
+        curPlate = ModelForExperiments.getInstance().getCurrentPlate();
+        slectedProbes = ModelForExperiments.getInstance().getProbesForOnePlate(curExperiment, curPlate);
+        probeSize = slectedProbes.size();
+        experimentProbeNoCol.setCellValueFactory(new PropertyValueFactory<probeTableData,Integer>("probeCount"));
+        experimentProbeNameCol.setCellValueFactory(new PropertyValueFactory<probeTableData,String>("probeForPlate"));
+        experimentProbeTable.setItems(slectedProbes);
         
-        //check sqlite database conenct 
-        if (BeadsModel.isDbConnected()) {
-            testSqlite.setText("Connected");
-        } else {
-            testSqlite.setText("Not Connected");
-        }
     }    
-    public void initData(ObservableList<bead> beadsfromXML)
-    {
-        allBeads = beadsfromXML;
-    }
 
     @FXML
-    private void addBeadAction(ActionEvent event) {
-        //get user slected data and add it into the experiement beads so that it shows on the add bead page 
-        bead beadSelected = beadsListTable.getSelectionModel().getSelectedItem();
-        experimentBeads.add(beadSelected);
-        slectedBeads.add(new bead(beadSelected.getRegionNumber(),beadSelected.getAnalyte()));    
-    }
+    private void addProbeAction(ActionEvent event) {
+        probeTableData probeSelected = probeTable.getSelectionModel().getSelectedItem();
+        String probe = probeSelected.getProbeForPlate();
+       if(probeAlreadyChoosen(probe))
+       {
+            ErrorMsg error = new ErrorMsg();
+            error.showError("proble " + probeSelected.getProbeForPlate() + " already choosen!");           
+       }
+       if(slectedProbes.size()>= probeSize)
+       {
+            ErrorMsg error = new ErrorMsg();
+            error.showError("the Max probe allowed for experiment " + curExperiment + " plate" + curPlate + " is " + probeSize);
+       }  
+       else
+       {
+            //get user slected data and add it into the experiement beads so that it shows on the add bead page 
+            int index = slectedProbes.size();
+            probeTableData newProbe = new probeTableData(index+1, probe);
+            slectedProbes.add(newProbe);
+            ModelForExperiments.getInstance().setProbeListForOnePlate(curExperiment, curPlate, slectedProbes);         
+       }
 
-    @FXML
-    private void deleteBeadAction(ActionEvent event) {
-        bead beadToDelete = experimentBeadsTable.getSelectionModel().getSelectedItem();
-        experimentBeads.remove(beadToDelete);
-        slectedBeads.remove(slectedBeads);
-    }
-
-    @FXML
-    private void updateBeadsforExperiment(ActionEvent event) {
-        int beadPlate = ModelForProbeTabe.getInstance().getCurrentPate();
-        int curExperiment = ModelForProbeTabe.getInstance().getCurrentExperiment();
-        ModelForProbeTabe.getInstance().setProbes(curExperiment, beadPlate, slectedBeads);
-        
-        Button  source =  (Button)event.getSource();       
-        Stage stage  = (Stage) source.getParent().getScene().getWindow();
-        stage.close();
     }
     
+    // helper function to check if probe already choosen 
+    private boolean probeAlreadyChoosen(String probe )
+    {
+        for(probeTableData data :slectedProbes )
+        {
+            if(data.getProbeForPlate() == probe)
+                return true;
+        }
+        return false;
+    }
+
+    @FXML
+    private void deleteEvent(ActionEvent event) {
+        probeTableData probeSelected = experimentProbeTable.getSelectionModel().getSelectedItem();
+        // if the deleted probe is not the last one, need to other elements up. 
+        int count = probeSelected.getProbeCount() ;
+        if(count != slectedProbes.size()-1)
+        {
+            //move probes under the slected probe up one by one. 
+            for(int i = count+1; i < slectedProbes.size();i++)
+            {
+                String nextProbe = slectedProbes.get(i).getProbeForPlate();
+                slectedProbes.get(i-1).setProbeForPlate(nextProbe);
+            }
+        }
+        //delete the last one
+        slectedProbes.remove(slectedProbes.size()-1);      
+        ModelForExperiments.getInstance().setProbeListForOnePlate(curExperiment, curPlate, slectedProbes);  
+    }
+
+    @FXML
+    private void moveUpEvent(ActionEvent event) {
+        probeTableData probeSelected = experimentProbeTable.getSelectionModel().getSelectedItem();
+        int index = probeSelected.getProbeCount() - 1 ;
+          if(index > 0) 
+          {
+                swap(slectedProbes, index, index - 1);
+                ModelForExperiments.getInstance().setProbeListForOnePlate(curExperiment, curPlate, slectedProbes);   
+          }
+          else // if the selected item is the top item, no move
+          {
+              ErrorMsg error = new ErrorMsg();
+              error.showError("can not move up the top item!");
+          }
+          
+          
+          experimentProbeTable.refresh();    
+          
+          
+    }
+    private void swap(ObservableList<probeTableData> slectedProbes, int j, int i) {
+        String s1 = slectedProbes.get(i).getProbeForPlate();
+        String s2 = slectedProbes.get(j).getProbeForPlate();
+        slectedProbes.get(i).setProbeForPlate(s2);
+        slectedProbes.get(j).setProbeForPlate(s1);
+    }
+    
+    @FXML
+    private void moveDownEvent(ActionEvent event) {
+        probeTableData probeSelected = experimentProbeTable.getSelectionModel().getSelectedItem();
+        int index = probeSelected.getProbeCount() - 1 ;
+        if(index == slectedProbes.size())
+        {
+              ErrorMsg error = new ErrorMsg();
+              error.showError("can not move up the bottom item!");
+        }
+        else
+        {
+            swap(slectedProbes, index, index + 1);
+            ModelForExperiments.getInstance().setProbeListForOnePlate(curExperiment, curPlate, slectedProbes);   
+        }
+        experimentProbeTable.refresh();        
+    }
+
+
 }
