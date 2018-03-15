@@ -5,6 +5,8 @@
  */
 package Controller;
 
+import Model.ModelForExperiments;
+import Util.ErrorMsg;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -140,6 +142,7 @@ public class MenuBarController implements Initializable{
     }    
 
     private void switchToInput() {
+
         try {
 
         URL paneTwoUrl = getClass().getResource("/View/Homepage.fxml");
@@ -154,6 +157,13 @@ public class MenuBarController implements Initializable{
     }
 
     private void switchToMedianValue() {
+        // when no experiments has been set up, median value has no data to show. 
+        if(ModelForExperiments.getInstance().getExperiments()==null || ModelForExperiments.getInstance().getExperiments().isEmpty())
+        {
+            ErrorMsg error = new ErrorMsg();
+            error.showError("Please set up experiments first!");
+            return;
+        }
         try {
 
         URL paneTwoUrl = getClass().getResource("/View/MedianValue.fxml");

@@ -6,16 +6,23 @@
 package Controller;
 
 import Model.ModelForExperiments;
+import Model.ModelForMedianValue;
 import Model.UserInputForBeadPlate;
 import Model.bead;
 import Model.probeTableData;
+import Util.ErrorMsg;
+import Util.StAXParser;
 import static com.sun.java.accessibility.util.AWTEventMonitor.addActionListener;
 import java.awt.event.ActionListener;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -23,21 +30,28 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
+import javafx.stage.Stage;
 
 /**
  * FXML Controller class
@@ -62,12 +76,19 @@ public class MedianValueController implements Initializable {
     
     ToggleGroup group = new ToggleGroup(); // For manage radio buttons for users to select. 
     ObservableList<bead> analytes = FXCollections.observableArrayList();
-    List<TextField> medianValueCellsList = new ArrayList<>(); // List to hold textfield in each gridpane cells. 
+    List<Label> medianValueCellsList = new ArrayList<>(); // List to hold textfield in each gridpane cells. 
     private GridPane medianValueGridPane;
     @FXML
     private GridPane platesGridPane;
     @FXML
-    private Button testClear;
+    private Text sampleName;
+    
+    //info for pop up page
+    private int analyteIndexForPopUpPage =0;
+    private int plateIndexForPopUpPage =0;
+    private int probeIndexForPopUpPage =0;
+    String[] samplesNames ;
+    
     /**
      * Initializes the controlayoutCellsListller class.
      */
@@ -75,8 +96,10 @@ public class MedianValueController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
          
         experiments = ModelForExperiments.getInstance().getNumberOfExperiments();
-        samples = getLargestSampleCountForAllExperiment();       
-        //initilizeFakeData();
+        samples = getLargestSampleCountForAllExperiment();  
+        analytes = ModelForExperiments.getInstance().getAnalytes();
+        calcaluateMedianValueMatrix();
+        ModelForExperiments.getInstance().getMedianValueMatrix();//for debug
         tableRow(experiments);    
         tableCol(samples);
         fillRadioButton();
@@ -84,7 +107,8 @@ public class MedianValueController implements Initializable {
         spForMedianValue.setContent(platesGridPane);
         //sp1.setFitToWidth(true);
         //gridPane.setHgrow(sp1, Priority.ALWAYS);
-        
+
+
         // display right content and remove previous slection of radio button. 
         group.selectedToggleProperty().addListener(new ChangeListener<Toggle>(){
             @Override
@@ -92,11 +116,14 @@ public class MedianValueController implements Initializable {
                 if (group.getSelectedToggle() != null) 
                 {
                     curExperiment = gridPane.getRowIndex((Node) newValue);
+                    curSample = gridPane.getColumnIndex((Node) newValue);
+                    ModelForExperiments.getInstance().setCurSample(curSample);
+            
                     oldValue.setSelected(false);
                     showMedianValue();
                 }
             }
-        });
+        });   
         
     }    
 
@@ -106,30 +133,31 @@ public class MedianValueController implements Initializable {
         //set width for cells of the cols
         ColumnConstraints column = new ColumnConstraints(100);
         gridPane.getColumnConstraints().add(column);
-        TextField textField = new TextField();
-        String s = "Experiment " + i;
-        textField.setText(s);    
+        Label label = new Label();
+        String s = "  Experiment " + i;
+        label.setText(s);    
         //textField.setAlignment(Pos.CENTER);
-        textField.autosize();
-        gridPane.add(textField,0,i);
+        label.autosize();
+        gridPane.add(label,0,i);
      }
     return gridPane;
     }
 
      //dynamically add cols for gridpane base on previous user input. 
     public  void tableCol(int col){
+        
     for(int i=1; i<=col; i++){
         //set width for cells of the cols
         ColumnConstraints column = new ColumnConstraints(100);
         gridPane.getColumnConstraints().add(column);        
-        TextField textField = new TextField();
-        String s = "Sample " + i;
-        textField.setText(s);    
-        textField.autosize();
+        Label label = new Label();
+        String s = "  " + samplesNames[i-1];
+        label.setText(s);    
+        label.autosize();
         //add them to the GridPane
-        gridPane.add(textField,i,0);
+        gridPane.add(label,i,0);
         // margins are up to your preference
-        GridPane.setMargin(textField, new Insets(5));
+        GridPane.setMargin(label, new Insets(5));
      }
     }    
 
@@ -151,12 +179,11 @@ public class MedianValueController implements Initializable {
                 }
                 btn.setToggleGroup(group);
                 gridPane.add(btn, j, i);
-                GridPane.setMargin(btn, new Insets(25));
+                GridPane.setMargin(btn, new Insets(10));
             }
         }
    
     }    
-    
     //after user slecting a sample(radio button), display median value data in bottom table
     //structure: one grid pane for plate. each plate needs a grid pane. 
     private void showMedianValue() {
@@ -164,61 +191,186 @@ public class MedianValueController implements Initializable {
         platesGridPane.getChildren().clear();
        // platesGridPane.gridLinesVisibleProperty().set(true);
         
+       // display sample name on the top of the table
+      UserInputForBeadPlate input = ModelForExperiments.getInstance().getUserInputsForBeadPlateMap().get(curExperiment).get(0); // get the user input for 1st plate
+      String[] names = input.getNames();
+      sampleName.setText(names[curSample -1]); // show sample name for the median value table        
+       
         //diaply analyte information on the 1st colomn
         analytes = ModelForExperiments.getInstance().getAnalytes();
         for(int i = 1; i <= analytes.size();i++)
         {
             //set width for cells of the cols
-            ColumnConstraints column = new ColumnConstraints(100);
+            ColumnConstraints column = new ColumnConstraints(70);
             platesGridPane.getColumnConstraints().add(column);            
-            TextField textField = new TextField();
-            String s = analytes.get(i-1).getAnalyte();
-            textField.setText(s);    
-            textField.autosize();
-            platesGridPane.add(textField,0,i+1);
-           // GridPane.setMargin(textField, new Insets(0));
+            Label label = new Label();
+            String s = analytes.get(i-1).getAnalyte() + "(" + analytes.get(i-1).getRegionNumber() + ")";
+            label.setText(s);    
+            label.autosize();
+            platesGridPane.add(label,0,i+1);
         }
- 
-        //display plate information on the 1st row & probes infor on the 2nd row
+        
+
+    //display plate information on the 1st row & probes infor on the 2nd row
         HashMap<Integer, ObservableList<probeTableData>> probesListForCurExperiment = ModelForExperiments.getInstance().getProbeMapForPopulate().get(curExperiment); 
         int countsOfPlates = probesListForCurExperiment.size() -1; // initilize probelistForCurexperiment contains key=0 value, which is never used and is empty
         // display probes 
-        int pos = 1;
+        int pos = 1; // for put plate 1/2 at the right position. 
         for(int i = 1; i <= countsOfPlates; i++)
         {
             //set width for cells of the cols
-            ColumnConstraints column = new ColumnConstraints(100);
+            ColumnConstraints column = new ColumnConstraints(70);
             platesGridPane.getColumnConstraints().add(column);                
-            TextField textField = new TextField();
+            Label label = new Label();
             String s = "Plate " + i;
-            textField.setText(s);   
-            textField.autosize();         
+            label.setText(s);   
+            label.autosize();         
             //add them to the GridPane
-            platesGridPane.add(textField,pos,0);
+            platesGridPane.add(label,pos,0);
          
             ObservableList<probeTableData> probes = ModelForExperiments.getInstance().getProbeListForPopulate(curExperiment, i);
             for(int j = 0 ; j < probes.size();j++)
             {
                 platesGridPane.getColumnConstraints().add(column);    
-                textField = new TextField();
-                s = probes.get(j).getProbeForPlate();
-                textField.setText(s);    
-                textField.autosize();                          
-                platesGridPane.add(textField,pos,1); //add them to the GridPane
-                pos++;
+                Label label1  = new Label();
+                s = probes.get(j).getProbeForPlate(); // get probe's name (analyte)
+                label1.setText(s);    
+                label1.autosize();                          
+                platesGridPane.add(label1,pos,1); //add them to the GridPane
+                pos++;                
+                //showMedianValueDataInPlace(i,j,probes,medianValueOriginalData); 
+                //getOneProbeDataForMedianValue(int experimentPos, int plateIndex,  int sampleIndex, int probeIndex)
+                HashMap<Integer, Double> finalMedianValueForOneProbe  =  ModelForExperiments.getInstance().getOneProbeDataForMedianValue(curExperiment , i-1, curSample-1 , j);
+                displayMedianValueforOneProbe(i, j, finalMedianValueForOneProbe);
             }            
         }       
+    }   
+ 
+    //helper function: calculate right well no in xml files. 
+    // wells count in this project from col to col, wells count in xml files from row to row. 
+    private int getWellNoInXmlFiles(int n)
+    {
+        int row  = n%8;
+        int col = n/8 +1;
+        if(row == 0) // the 8th row elements
+        {
+            row = 8;
+            col = n/8;
+        }        
+        int res = (row -1)*12 + col;
+        return res;
     }
     
+    // if not platePos is not 1, it means it has previous probes of previous plates. 
+    private int getPreProbes(int platePos)
+    {
+        int preProbes = 0; 
+        HashMap<Integer, ObservableList<probeTableData>> probesListForCurExperiment = ModelForExperiments.getInstance().getProbeMapForPopulate().get(curExperiment);             
+        for(int i = 1; i< platePos;i++ ) // don't count the current plate
+         {
+             preProbes += probesListForCurExperiment.get(i).size();
+         }            
+        return preProbes;
+    }
+    
+    //Helper function : diaply meidan value in page for one probe
+     //platePos starts from 1, probeIndex starts from 0. 
+    private void displayMedianValueforOneProbe(int platePos, int probeIndex, HashMap<Integer, Double> finalMedianValueForOneProbe) {
+        //calclulate the col number to populate median value of this probe  = previous plate + cur Platepos
+        int preProbes = 0; // if not platePos is not 1, it means it has previous probes of previous plates. 
+        if(platePos>1)
+        {
+           preProbes = getPreProbes(platePos);      
+        }
+        int pos = preProbes + (probeIndex +1); 
+        
+       // final TextField[] textfields = new TextField[analytes.size()]; 
+        for(int i = 1; i <= analytes.size();i++)
+        {
+            //set width for cells of the cols
+            ColumnConstraints column = new ColumnConstraints(70);
+            platesGridPane.getColumnConstraints().add(column);            
+            Label label = new Label();
+            platesGridPane.setRowIndex(label, i);
+            platesGridPane.setColumnIndex(label,probeIndex);
+            double medianValue = finalMedianValueForOneProbe.get(analytes.get(i-1).getRegionNumber());
+            label.setText(Double.toString(medianValue));   
+            //set the following three index for pop up page
+            //analyteIndex = i-1;
+            //when users click the median value, pops up a new page to diaplay other information 
+            label.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent e) {
+                    try {
+                       
+                        analyteIndexForPopUpPage = GridPane.getRowIndex( label) -2 ;
+                        plateIndexForPopUpPage = platePos -1 ;
+                        //probeIndexForPopUpPage = GridPane.getColumnIndex( label) -1 ;
+                        int preProbes = getPreProbes(platePos);// for debug
+                        probeIndexForPopUpPage = (GridPane.getColumnIndex( label) -1) - getPreProbes(platePos);
+
+                        
+                        displayAnalyteInOtherSamples();
+                    } catch (MalformedURLException ex) {
+                        Logger.getLogger(MedianValueController.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            });
+            label.autosize();            
+            platesGridPane.add(label,pos,i+1);
+           // GridPane.setMargin(label, new Insets(0));
+        }
+    }
+        
+    //helper function : calculate final median value for one Probe.
+    private  HashMap<Integer, Double>  calculateMedianValue(List<HashMap<Integer, Double>> wellsForCalculate) {
+        
+        HashMap<Integer, Double> finalMedianValueForOneProbe = new HashMap<>();
+        for(int i = 0; i < analytes.size();i++)
+        {
+            int regionNumber = analytes.get(i).getRegionNumber();       
+            double sum = 0;
+            //System.out.println("curEepriment is " + curExperiment + ". cur curSample is "  + curSample + ". cur RegionNumber is " + regionNumber);
+            for(HashMap<Integer, Double> map : wellsForCalculate)
+            {
+
+                //double data = map.get(regionNumber);
+                sum += map.get(regionNumber);
+            }
+            double finalMeidanValue = sum / wellsForCalculate.size();
+            finalMedianValueForOneProbe.put(regionNumber, finalMeidanValue);
+        }
+        return finalMedianValueForOneProbe;
+    }
+
+    //helper function to use stax parser to get median value maps 
+    // size = # of files/plates
+    private  List<HashMap<Integer, HashMap<Integer,  Double>>> getMeidanValueOriginalData(int experimentPos) {
+    String directory = ModelForExperiments.getInstance().getDirectory();
+    List<String> files = ModelForExperiments.getInstance().getExperimentsXMLFileMap().get(experimentPos);
+    List<String> absolutePath = new ArrayList<>();
+    List<HashMap<Integer, HashMap<Integer,  Double>>> meidanValueData = new ArrayList<>();
+    StAXParser parser = new StAXParser();
+    for(int i = files.size()-1 ; i >=0; i--) // the sequence should be backwards
+    {
+       absolutePath.add(directory + "\\" + files.get(i) );   
+     }
+    
+    for(int i = 0 ; i < absolutePath.size();i++)
+    {
+        meidanValueData.add(parser.getMedianValueData(absolutePath.get(i)));
+    }
+     return meidanValueData;    
+}    
     
     //helper function: get cells in a grid pane so tha
     public void  getCells(GridPane gridPane)
     {
             for(Node currentNode : gridPane.getChildren())
             {
-                if (currentNode instanceof TextField)
+                if (currentNode instanceof Label)
                 {
-                    medianValueCellsList.add((TextField)currentNode);
+                    medianValueCellsList.add((Label)currentNode);
                     
                 }
             }
@@ -226,13 +378,13 @@ public class MedianValueController implements Initializable {
     }
     
         
-    //heleper function: clear the bead plate layout. However, it also clears grid lines. 
+    //heleper function: clear the bead plate layou 
     private void clearMedianValueGridPaneLayout()
    {
 
            for(int j =0; j <medianValueCellsList.size(); j++)
            {
-               medianValueCellsList.get(j).clear();
+               medianValueCellsList.get(j).setText("");
                medianValueCellsList.get(j).setStyle("-fx-background-color:white;");
            }
            
@@ -243,17 +395,27 @@ public class MedianValueController implements Initializable {
     private int getLargestSampleCountForAllExperiment() {
         HashMap<Integer, List<UserInputForBeadPlate>> userInputsForBeadPlateMap = ModelForExperiments.getInstance().getUserInputsForBeadPlateMap();
         int res = 0;
+        int iIndex = 0;
+        int jIndex =0;
         for(int i = 1; i <= userInputsForBeadPlateMap.size();i++)
         {
-            List<Integer> samplesCount = new ArrayList<>();
-            for(UserInputForBeadPlate input :userInputsForBeadPlateMap.get(i) )
+            List<Integer> samplesCountForOneExperiment = new ArrayList<>();
+             List<UserInputForBeadPlate> inputs =  userInputsForBeadPlateMap.get(i);
+            for(int j = 0; j < inputs.size();j++)
             {
+                UserInputForBeadPlate input = inputs.get(j);
                 int size = input.getNumOfSamples();
-                samplesCount.add(input.getNumOfSamples());
-                res = Math.max(res, input.getNumOfSamples());
+                samplesCountForOneExperiment.add(input.getNumOfSamples());
+                if(res < size)
+                {
+                    iIndex =  i;
+                    jIndex =  j;
+                    res = size;
+                }
             }
-            mapOfSamples.put(i, samplesCount);
+            mapOfSamples.put(i, samplesCountForOneExperiment);
         }
+        samplesNames = userInputsForBeadPlateMap.get(iIndex).get(jIndex).getNames(); 
         return res;
     }
 
@@ -289,13 +451,100 @@ public class MedianValueController implements Initializable {
             
     }
 
-    @FXML
-    private void testClearAction(ActionEvent event) {
-        clearMedianValueGridPaneLayout();
+    // open pop up page to dispaly other values 
+    // analytePos starts from 1, platePos starts from 1, probePos starts from 0. 
+    private void displayAnalyteInOtherSamples() throws MalformedURLException {
+        //bead analyteIndex = analytes.get(analytePos -1);
+        ModelForExperiments.getInstance().setCurAnalyte(analytes.get(analyteIndexForPopUpPage));
+        bead curan = ModelForExperiments.getInstance().getCurAnalyte(); // for debug 
+        ModelForExperiments.getInstance().setCurPlate(plateIndexForPopUpPage); 
+        ModelForExperiments.getInstance().setCurProbe(probeIndexForPopUpPage);
+        ModelForExperiments.getInstance().setNumberOfSamples(samples);
+        ModelForExperiments.getInstance().setSampleNames(samplesNames);
+        // open up the pop up page 
+        URL url = Paths.get("./src/View/PopUpMedianValue.fxml").toUri().toURL();
+         Parent root ;
+               try {
+                FXMLLoader fxmlLoader = new FXMLLoader();
+                root = fxmlLoader.load(url);
+                Stage stage = new Stage();
+                stage.setScene(new Scene(root));  
+                stage.showAndWait();
+
+        //stage.show();
+        } catch(Exception e) {
+           e.printStackTrace();
+          }
+   
     }
 
-            
-     
+    private void calcaluateMedianValueMatrix() {
+        for(int i = 1; i <=experiments;i++)
+        {
+            List<HashMap<Integer, HashMap<Integer,  Double>>> medianValueOriginalData = getMeidanValueOriginalData(i);
+            HashMap<Integer, ObservableList<probeTableData>> probesListForCurExperiment = ModelForExperiments.getInstance().getProbeMapForPopulate().get(i); 
+            List<UserInputForBeadPlate> inputs =  ModelForExperiments.getInstance().getUserInputsForBeadPlateMap().get(i);
+            int numberOfPlates = inputs.size();
+            //System.out.println("experiment is " + i ); // for debug
+            for(int j = 0; j < numberOfPlates; j++)
+            {
+                UserInputForBeadPlate input = inputs.get(j);
+                int numberOfSamples  = input.getNumOfSamples();
+                ObservableList<probeTableData> ProbesForOnePlate = probesListForCurExperiment.get(j+1);
+                int numberOfProbes = input.getNumOfProbes();
+                //System.out.println("plate Index is " + j ); // for debug
+                for(int k = 0; k<numberOfSamples; k++ )
+                {
+                    //System.out.println("sample Index is " + k); 
+                     for(int x = 0; x<numberOfProbes; x++)
+                     {
+                        //System.out.println("probe Index is " + x ); 
+                        HashMap<Integer, Double> finalMedianValueForOneProbe  = getFinalMeidianValueForOneProbe(i,j,k,x, ProbesForOnePlate, medianValueOriginalData, input);
+                        ModelForExperiments.getInstance().setOneProbeDataForMedianValue(i, j, k, finalMedianValueForOneProbe);
+                        //for debug
+                        HashMap<Integer, List<List<List<HashMap<Integer,Double>>>>> meidanValueMatrix =  ModelForExperiments.getInstance().getMedianValueMatrix();
+                        List<List<List<HashMap<Integer,Double>>>> exper = meidanValueMatrix.get(i);
+                        List<List<HashMap<Integer,Double>>> plat =exper.get(j);
+                        List<HashMap<Integer,Double>> samp = plat.get(k);
+                                
+                     }
+                }
+
+            }
+
+        }
+    }
+
+    private HashMap<Integer, Double> getFinalMeidianValueForOneProbe(int experimentPos, int plateIndex, int sampleIndex, int probeIndex, 
+            ObservableList<probeTableData> ProbesForOnePlate, List<HashMap<Integer, HashMap<Integer, Double>>> medianValueOriginalData, 
+            UserInputForBeadPlate userInput) {
+        HashMap<Integer, HashMap<Integer,  Double>> dataMap = medianValueOriginalData.get(plateIndex);
+        int numberOfSamples = userInput.getNumOfSamples();
+        ModelForExperiments.getInstance().setNumberOfSamples(numberOfSamples);
+        int numberOfReplicas = userInput.getNumOfReplicas();
+        HashMap<Integer, Double> finalMedianValueForOneProbe  = new HashMap<>();// for  final median value data
+        
+        int probePos = probeIndex;
+        int samplePos = sampleIndex+1;
+        int prevWells = probePos *(numberOfSamples * numberOfReplicas); // previous wells to get right number of wells to start
+        List< HashMap<Integer,  Double>>  wellsForCalculate = new ArrayList<>();
+        samplePos = prevWells + samplePos; //  well of sample
+        int wellNo = getWellNoInXmlFiles(samplePos);
+        wellsForCalculate.add(dataMap.get(wellNo));
+        for(int j = 1; j < numberOfReplicas; j++)
+        {
+            int replicaPos = samplePos + j*numberOfSamples;
+            wellNo = getWellNoInXmlFiles(replicaPos);
+            wellsForCalculate.add(dataMap.get(wellNo)); // well of relicas 
+        }
+        finalMedianValueForOneProbe = calculateMedianValue(wellsForCalculate); // get final median value data 
+        //System.out.println("curExperiment is " + curExperiment + ". curSample is " + curSample + ". cur plate is " + platePos + ". cur Probe is " + probePos);
+
+        return finalMedianValueForOneProbe;
+    }
 }
 
 
+
+            
+     

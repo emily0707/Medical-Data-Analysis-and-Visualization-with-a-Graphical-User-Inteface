@@ -43,6 +43,31 @@ public class ModelForExperiments {
     private String  directory; //absolute  directory of xml files. 
     private ObservableList<Integer> experiments; // for choice box display # of experiments 
     
+    /* Median value Matrix data strucuture explanation.
+    for each experiment and sample, HashTable<Integer, List<SampleData>> (key: number of experiment; value: list of sample data)
+                   sample1  sample2
+    experiment 1
+    experiment 2
+    
+    Sampe data : List<List<List<HashMap<Integer,Double>>>>
+    for each sample data : List<PlateData>
+    for each Platedata List<probeData>
+    for probe data: HashTable<Integer, double> (key: analyte region number, value: median value for that analyte)
+               plate 1                        plate2         
+               probe1    probe2   probe3      probe1     probe2    probe3
+    Analyte1 
+    Analyte2
+    */
+    HashMap<Integer, List<List<List<HashMap<Integer,Double>>>>> meidanValueMatrix = new HashMap<>();
+     // pass analyte, curPlate, curProbe when user click one meidan value to open a pop up page.
+    private bead curAnalyte;
+    private int curPlate =0;
+    private int curProbe =0;
+    private int curSample = 0;
+    private int numberOfSamples = 0;
+    private String[] sampleNames;
+    
+    
     public static ModelForExperiments getInstance() {
         return instance;
     }
@@ -67,12 +92,12 @@ public class ModelForExperiments {
         return analytes;
     }
     
-    public int getCurrentPlate()
+    public int getCurPlate()
     {
         return currentPlate;
     }
     
-    public void setCurrentPlate(int plate)
+    public void setCurPlate(int plate)
     {
         currentPlate = plate;
     }
@@ -129,7 +154,7 @@ public class ModelForExperiments {
    public void initilizeProbeListForPopulate()
    {
        //if not empty clear it first. (for manually set up experiments)
-       if(probesListForPopulate.size()!=0) 
+       if(!probesListForPopulate.isEmpty()) 
            probesListForPopulate.clear();
        
        for(int i = 1; i <=numberOfExpriments; i++ )
@@ -170,6 +195,7 @@ public class ModelForExperiments {
     }
     
     // this function is for test 
+    /*
     public ObservableList<probeTableData> getProbesForOnePlate(int experiement, int beadPlate)
     {
         if(!probesListForPopulate.containsKey(experiement)) 
@@ -188,6 +214,7 @@ public class ModelForExperiments {
             return probesListForPopulate.get(experiement).get(beadPlate);
 
     }
+    */
     
     //create probe container for each experiemnt
     public void addExperiement(int experiements)
@@ -288,6 +315,96 @@ public class ModelForExperiments {
         return XMLFileMap;
     }
  
+
+
     
+    public HashMap<Integer, List<List<List<HashMap<Integer,Double>>>>>    getMedianValueMatrix()
+    {
+        return meidanValueMatrix;
+    }
     
+    public void setMedianValueMatrix(HashMap<Integer, List<List<List<HashMap<Integer,Double>>>>> meidanValueMatrix)
+    {
+        this.meidanValueMatrix = meidanValueMatrix;
+    }   
+
+    //experiment starts from 1, sampleIndex, PlateIndex, probeIndex start from 0
+    public  void setOneProbeDataForMedianValue(int experimentPos, int plateIndex,  int sampleIndex,  HashMap<Integer,Double> meidanValueDataForOneProbe)
+    {
+        // when median value matrix is empty, initialize it. 
+        if(meidanValueMatrix.isEmpty() || !meidanValueMatrix.containsKey(experimentPos) ) 
+        {
+            List<List<List<HashMap<Integer,Double>>>> experiment= new ArrayList<>();
+            meidanValueMatrix.put(experimentPos, experiment);
+        }
+        if(meidanValueMatrix.get(experimentPos).isEmpty() || meidanValueMatrix.get(experimentPos).size() < (plateIndex+1))
+        {
+            List<List<HashMap<Integer,Double>>> plate = new ArrayList<>();
+            meidanValueMatrix.get(experimentPos).add(plate);
+        }
+        if(meidanValueMatrix.get(experimentPos).get(plateIndex).isEmpty() || meidanValueMatrix.get(experimentPos).get(plateIndex).size() < (sampleIndex+1))
+        {
+            List<HashMap<Integer,Double>> sample = new ArrayList<>();
+            meidanValueMatrix.get(experimentPos).get(plateIndex).add(sample);
+        }
+        //sample starts from 1. sampleIndex = sample -1;  //plate starts from 1. plateIndex = plate -1;
+        meidanValueMatrix.get(experimentPos).get(plateIndex).get(sampleIndex).add(meidanValueDataForOneProbe);
+    }   
+    
+    public HashMap<Integer,Double> getOneProbeDataForMedianValue(int experimentPos, int plateIndex,  int sampleIndex, int probeIndex)
+    {
+        return meidanValueMatrix.get(experimentPos).get(plateIndex).get(sampleIndex).get(probeIndex);
+    }
+
+    
+    public bead getCurAnalyte()
+    {
+        return curAnalyte;
+    }
+    
+    public void setCurAnalyte(bead curAnalyte)
+    {
+        this.curAnalyte = curAnalyte;
+    }
+
+        
+    public int getCurProbe()
+    {
+        return curProbe;
+    }
+    
+    public void setCurProbe(int curProbe)
+    {
+        this.curProbe = curProbe;
+    }
+
+    public int getNumberOfSamples()
+    {
+        return numberOfSamples;
+    }
+    
+    public void setNumberOfSamples(int numberOfSamples)
+    {
+        this.numberOfSamples = numberOfSamples;
+    }
+    
+    public int getCurSample()
+    {
+        return curSample;
+    }
+    
+    public void setCurSample(int curSample)
+    {
+        this.curSample = curSample;
+    }
+    public String[]  getSampleNames()
+    {
+        return sampleNames;
+    }
+    
+    public void setSampleNames(String[] sampleNames)
+    {
+        this.sampleNames = sampleNames;
+    }
+        
 }

@@ -232,7 +232,7 @@ public class HomepageController implements Initializable {
     //default data to user Input area 
     String namesInput = "WK,WC,HK,HC";
     String[] names = namesInput.split(",");
-    UserInputForBeadPlate defaultUserInput = new UserInputForBeadPlate(2, 2, namesInput, names,10, new ArrayList<String>());
+    UserInputForBeadPlate defaultUserInput = new UserInputForBeadPlate(4, 2, namesInput, names,10, new ArrayList<String>());
 
 
         
@@ -240,7 +240,17 @@ public class HomepageController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {      
 
         //HashMap<Integer, List<UserInputForBeadPlate>> userInputsForBeadPlateMap= new HashMap<>(); 
-
+        //initilize probe to load for probe table 1
+        String[] probesList1 = {"Fyn","PSD95","NMDAR1","NMDAR2A","NMDAR2B","mGluR5","Shank3","Homer1","Homer1a","PI3K"};
+        for(int i = 1; i <= probesList1.length; i++)
+        {
+            probesToLoad1.add(new probeTableData(i, probesList1[i-1]));
+        }
+        String[] probesList2 = {"GluR1","GluR2","SynGAP","SAP97","NLGN3","Ube3a","CamKII","SAPAP","panSHANK","Shank1"};
+        for(int i = 1; i <= probesList2.length; i++)
+        {
+            probesToLoad2.add(new probeTableData(i, probesList2[i-1]));
+        }
         
         //poplulate files list 
         if(ModelForExperiments.getInstance().getXMLFiles()!=null && !ModelForExperiments.getInstance().getXMLFiles().isEmpty() )
@@ -302,12 +312,7 @@ public class HomepageController implements Initializable {
         
         
         
-        //initilize probe to load for probe table 1
-        String[] probesList1 = {"Fyn","PSD95","NMDAR1","NMDAR2A","NMDAR2B","mGluR5","Shank3","Homer1","Homer1a","PI3K"};
-        for(int i = 1; i <= probesList1.length; i++)
-        {
-            probesToLoad1.add(new probeTableData(i, probesList1[i-1]));
-        }
+
         
         //set beads data into bead plate 1 probe List table. 
         
@@ -340,11 +345,7 @@ public class HomepageController implements Initializable {
         );
 
 
-        String[] probesList2 = {"GluR1","GluR2","SynGAP","SAP97","NLGN3","Ube3a","CamKII","SAPAP","panSHANK","Shank1"};
-        for(int i = 1; i <= probesList2.length; i++)
-        {
-            probesToLoad2.add(new probeTableData(i, probesList2[i-1]));
-        }
+
          //set beads data into bead plate 2 probe List table. 
         ProbeCol2.setCellValueFactory(new PropertyValueFactory<probeTableData,Integer>("probeCount"));
         BeadPlate2ProbeCol.setCellValueFactory(new PropertyValueFactory<probeTableData,String>("probeForPlate"));   
@@ -414,7 +415,6 @@ public class HomepageController implements Initializable {
         
         List<File> selectedFiles = fc.showOpenMultipleDialog(null);
 
-        List<String> filesAbsolutePath = new ArrayList<>(); // save absolute path of every 
         HashMap<Integer, List<String>> mapOfExperimentsWithAbsolutePath = new HashMap<>();
         if(selectedFiles!= null)
         {
@@ -438,7 +438,7 @@ public class HomepageController implements Initializable {
                 fileNames.add(filename);
             } 
             ModelForExperiments.getInstance().setXMLFiles(fileNames);
-            int count = fileNames.size() /2;
+            int count = fileNames.size() %2 == 1 ? fileNames.size() /2+1 : fileNames.size() /2;
             ModelForExperiments.getInstance().setNumberOfExperiments(count);
             
             //set value to experiements dropbox base on # of experiments.
@@ -446,7 +446,6 @@ public class HomepageController implements Initializable {
             int index = 0;
             for(int i = 1; i <=count; i++)
             {
-
                 counts.add(i);                
                 mapOfExperiments.put(i, new ArrayList<String>());                
                 mapOfExperiments.get(i).add(fileNames.get(index++));                           
@@ -499,7 +498,7 @@ public class HomepageController implements Initializable {
         beadPlateCol.setCellValueFactory(new PropertyValueFactory<PlateStatus,String>("plate"));
         confirmedCol.setCellValueFactory(new PropertyValueFactory<PlateStatus,String>("status"));
         beadPlateStatusTable.setItems(status);    
-        numSampleInput1.setText("2");
+        //numSampleInput1.setText("2");
     }
     
    // change plate status to Yes after user click "confirm input " button 
@@ -537,6 +536,11 @@ public class HomepageController implements Initializable {
         ModelForExperiments.getInstance().getExperimentsXMLFileMap().clear();
         ModelForExperiments.getInstance().getExperiments().clear();
         
+        //clear analytes table 
+        analytes.clear();
+        ModelForExperiments.getInstance().getAnalytes().clear();
+        beadTable.refresh();
+        
         //clear choice box and other text
         experiments.clear();
         totalNumberOfExperiments.setText("0");
@@ -566,6 +570,9 @@ public class HomepageController implements Initializable {
        
        //clear bead plate layout
        clearLayout();     
+       
+       //clear median value data matrix 
+       ModelForExperiments.getInstance().getMedianValueMatrix().clear();
     }
     
     // choice box listener 
@@ -592,22 +599,29 @@ public class HomepageController implements Initializable {
         
         // display user set up information on the bead plate. 
         // change layout and user input infor for the new expriment if there are user inputs for current experiments
-        if(userInputsForBeadPlateMap.get(curExperiment)!=null && !userInputsForBeadPlateMap.get(curExperiment).isEmpty())
+        // if no user input or less then set up default inputs 
+        if(userInputsForBeadPlateMap.get(curExperiment)==null )
         {
-           int size = userInputsForBeadPlateMap.get(curExperiment).size();
-           //set dafault data into the model
-           if(size==0)
-           {
-               List<UserInputForBeadPlate> defaultInputs = new ArrayList<>();
+               List<UserInputForBeadPlate> defaultInputs = new ArrayList<>(); //??
+               ModelForExperiments.getInstance().setUserInputsForOneExperiment(curExperiment,defaultInputs); 
+        }
+        int size = userInputsForBeadPlateMap.get(curExperiment).size();
+        if(size != fileSize)
+        {
+            List<UserInputForBeadPlate> inputs = ModelForExperiments.getInstance().getUserInputsForBeadPlateMap().get(curExperiment);
                while(size!=fileSize)
                {
-                   defaultInputs.add(defaultUserInput);
+                   inputs.add(defaultUserInput);
                    size++;
                }
-               ModelForExperiments.getInstance().setUserInputsForOneExperiment(curExperiment,defaultInputs);
-           }
-           displayUserInput(userInputsForBeadPlateMap.get(curExperiment),size);
+               ModelForExperiments.getInstance().setUserInputsForOneExperiment(curExperiment,inputs);            
         }
+
+       userInputsForBeadPlateMap= ModelForExperiments.getInstance().getUserInputsForBeadPlateMap();
+       displayUserInput(userInputsForBeadPlateMap.get(curExperiment),size);
+       
+       // display bead plate layout and probe tables. 
+        checkLayoutEventHelper();
      }
     
     private void clearProbeTables()
@@ -685,7 +699,7 @@ public class HomepageController implements Initializable {
             if(!beadPlate2Tab.isDisabled()) 
             {
                probes2.clear();
-               probeTable3.refresh();  
+               probeTable2.refresh();  
                disablePlate2();
             }
             if(!beadPlate3Tab.isDisabled())
@@ -730,15 +744,14 @@ public class HomepageController implements Initializable {
         if(!probeTable1.isDisabled()){
     
                 ObservableList<probeTableData> probesForPlate1 = ModelForExperiments.getInstance().getProbeListForPopulate(curExperiment, 1);
-                    
-        if(probesForPlate1== null)
-         {
-             probesForPlate1 = FXCollections.observableArrayList();
-             ModelForExperiments.getInstance().addOneProbeListForPopulate(curExperiment, 1, probesForPlate1);
-         }
-        probes1.clear();
-        probes1.addAll(probesForPlate1);
-        probeTable1.refresh();                                 
+                if(probesForPlate1== null)
+                 {
+                     probesForPlate1 = FXCollections.observableArrayList();
+                     ModelForExperiments.getInstance().addOneProbeListForPopulate(curExperiment, 1, probesForPlate1);
+                 }
+                probes1.clear();
+                probes1.addAll(probesForPlate1);
+                probeTable1.refresh();                                 
     }
     }
         
@@ -834,7 +847,6 @@ public class HomepageController implements Initializable {
         //experiments.clear();
         //experiments.addAll(experimentsNew);
         DropdownExperimentsChoiceBox.setItems(experimentsNew);
-        ObservableList<Integer> experimentsTemp = DropdownExperimentsChoiceBox.getItems(); // for debug
         
         int defaultExperiment = 1;
         DropdownExperimentsChoiceBox.setValue(defaultExperiment);
@@ -844,28 +856,28 @@ public class HomepageController implements Initializable {
         XMLfilesNames.setText(generateXMLFilesString(files));    
         //nable & disable plate tab, bead , user input base on the # of xml files of current experiment
         int fileSize = files.size();
-        setUpExeprimentBaseOnSizeOfXMLFiles(fileSize);
+        //setUpExeprimentBaseOnSizeOfXMLFiles(fileSize);
 
         // update bead plate status table 
         initializePlateStatus();
         
         // update probe list map
-        ModelForExperiments.getInstance().initilizeProbeListForPopulate();
+       // ModelForExperiments.getInstance().initilizeProbeListForPopulate();
         
         //clear previous user input and layout if any, user needs to submit information again. 
-        ModelForExperiments.getInstance().getUserInputsForBeadPlateMap().clear(); 
+       // ModelForExperiments.getInstance().getUserInputsForBeadPlateMap().clear(); 
         
-        clearUserInput(fileSize);   
-        clearLayout();
+        //clearUserInput(fileSize);   
+        //clearLayout();
         
-        setUserInputByDefaultBaseOnSizeOfXMLFiles(fileSize); 
+       // setUserInputByDefaultBaseOnSizeOfXMLFiles(fileSize); 
         
         
         //add experiments to the context and create beadlist for each bead plate, data structure: map
-        for(int i =0; i<experiments.size();i++)
-        {
-            ModelForExperiments.getInstance().addExperiement(Integer.valueOf(count));
-        }
+        //for(int i =0; i<experiments.size();i++)
+       // {
+           // ModelForExperiments.getInstance().addExperiement(Integer.valueOf(count));
+       // }
     }
     
     // helper function :
@@ -1048,7 +1060,7 @@ public class HomepageController implements Initializable {
     {
         //update user input for bead plate 1
         numSampleInput1.setText(Integer.toString(data.get(0).getNumOfSamples()));
-        numReplicaInput1.setText(Integer.toString(data.get(0).getNumOfSamples()));
+        numReplicaInput1.setText(Integer.toString(data.get(0).getNumOfReplicas()));
         numProbeInput1.setText(Integer.toString(data.get(0).getNumOfProbes()));
         sampleNamesInput1.setText(data.get(0).getNameInput());        
     }
@@ -1056,7 +1068,7 @@ public class HomepageController implements Initializable {
     private void displayUserInputForBeadPlate2(List<UserInputForBeadPlate> data)
     {
         numSampleInput2.setText(Integer.toString(data.get(1).getNumOfSamples()));
-        numReplicaInput2.setText(Integer.toString(data.get(1).getNumOfSamples()));
+        numReplicaInput2.setText(Integer.toString(data.get(1).getNumOfReplicas()));
         numProbeInput2.setText(Integer.toString(data.get(1).getNumOfProbes()));
         sampleNamesInput2.setText(data.get(1).getNameInput());
     }
@@ -1064,7 +1076,7 @@ public class HomepageController implements Initializable {
     private void displayUserInputForBeadPlate3(List<UserInputForBeadPlate> data)
     {
         numSampleInput3.setText(Integer.toString(data.get(2).getNumOfSamples()));
-        numReplicaInput3.setText(Integer.toString(data.get(2).getNumOfSamples()));
+        numReplicaInput3.setText(Integer.toString(data.get(2).getNumOfReplicas()));
         numProbeInput3.setText(Integer.toString(data.get(2).getNumOfProbes()));
         sampleNamesInput3.setText(data.get(2).getNameInput());
     }
@@ -1133,8 +1145,30 @@ public class HomepageController implements Initializable {
         //find current experiment, put the experiement into the map associated with curexperiment number. 
         ModelForExperiments.getInstance().getUserInputsForBeadPlateMap().put(curExperiment , userInputsForBeadPlate);
         displayBeadsPlateLayout(curExperiment);        
+        displayProbeTable(size);
+        HashMap<Integer, HashMap<Integer, ObservableList<probeTableData>>> probesListForPopulate  = ModelForExperiments.getInstance().getProbeMapForPopulate(); // debug
+   
     }
     
+    // load probe and diaply probes on to probe tables base on xml files size. 
+    private void displayProbeTable(int size)
+    {
+       if(size == 1)
+       {
+           loadProbe1Helper() ;
+       }
+       else if (size == 2)
+       {
+           loadProbe1Helper() ;
+           loadProbe2Helper() ;
+       }
+       else
+       {
+           loadProbe1Helper() ;
+           loadProbe2Helper() ;
+           loadProbe3Helper() ;
+       }        
+    }
     //get data of current experiement and display the bead plate layout. 
     private void displayBeadsPlateLayout(int curExperiment)
     { 
@@ -1152,7 +1186,18 @@ public class HomepageController implements Initializable {
     // index: index of the bead plate 
     //data: user input data for that bead plate   
   private void displayLayout(int index, UserInputForBeadPlate data) {
-        //fill cells with colors and values base on users' inputs
+        
+                
+         if(beadPlates.size()==0)
+        {
+            beadPlateLayouts.add(beadPlate1Layout);
+            beadPlateLayouts.add(beadPlate2Layout);
+            beadPlateLayouts.add(beadPlate3Layout);
+            beadPlates.add(beadPlate1Tab);
+            beadPlates.add(beadPlate2Tab);       
+            beadPlates.add(beadPlate3Tab);   
+        }
+         //fill cells with colors and values base on users' inputs
         layoutCellsList = getCells(beadPlateLayouts.get(index));
         int cellsCount =0;
         String[] nameList = data.getNames(); 
@@ -1269,7 +1314,7 @@ public class HomepageController implements Initializable {
             ErrorMsg error = new ErrorMsg();
             error.showError("please load probe first!");                
         }
-        ModelForExperiments.getInstance().setCurrentPlate(1);
+        ModelForExperiments.getInstance().setCurPlate(1);
         loadAddBeadsPage();        
         curExperiment=ModelForExperiments.getInstance().getCurrentExperiment();    
         ObservableList<probeTableData> probesForPlate1 = ModelForExperiments.getInstance().getProbeListForPopulate(curExperiment, 1); //selected data for the bead plate
@@ -1295,7 +1340,7 @@ public class HomepageController implements Initializable {
             ErrorMsg error = new ErrorMsg();
             error.showError("please load probe first!");                
         }
-        ModelForExperiments.getInstance().setCurrentPlate(2);
+        ModelForExperiments.getInstance().setCurPlate(2);
         loadAddBeadsPage();        
         curExperiment=ModelForExperiments.getInstance().getCurrentExperiment();    
         ObservableList<probeTableData> probesForPlate2 = ModelForExperiments.getInstance().getProbeListForPopulate(curExperiment, 2); //selected data for the bead plate
@@ -1320,7 +1365,7 @@ public class HomepageController implements Initializable {
             ErrorMsg error = new ErrorMsg();
             error.showError("please load probe first!");                
         }
-        ModelForExperiments.getInstance().setCurrentPlate(3);
+        ModelForExperiments.getInstance().setCurPlate(3);
         loadAddBeadsPage();        
         curExperiment=ModelForExperiments.getInstance().getCurrentExperiment();    
         ObservableList<probeTableData> probesForPlate3 = ModelForExperiments.getInstance().getProbeListForPopulate(curExperiment, 3); //selected data for the bead plate
@@ -1341,7 +1386,12 @@ public class HomepageController implements Initializable {
 
 
     @FXML
-    private void loadProbe1Event(ActionEvent event) {
+    private void loadProbe1Event(ActionEvent event) {       
+        loadProbe1Helper();
+    }
+    
+    private void loadProbe1Helper() {
+        
         if(probes1.size()!=0)  // if not empty, clear previous data first. 
             probes1.clear();
 
@@ -1370,12 +1420,14 @@ public class HomepageController implements Initializable {
                 probeTable1.refresh();
 
             }
-
-        
-    }
+    }    
 
     @FXML
     private void loadProbe2Event(ActionEvent event) {
+      loadProbe2Helper();
+    }
+
+    private void loadProbe2Helper() {
         if(probes2.size()!=0)  // if not empty, clear previous data first. 
             probes2.clear();
 
@@ -1402,11 +1454,14 @@ public class HomepageController implements Initializable {
                 probeTable2.refresh();
 
             }
-
     }
-
+    
     @FXML
     private void loadProbe3Event(ActionEvent event) {
+        loadProbe3Helper();
+    }
+
+   private void loadProbe3Helper() {
         if(probes3.size()!=0)  // if not empty, clear previous data first. 
             probes3.clear();
             // if no map generate for current experiment probles, initiliaze it. 
@@ -1434,9 +1489,9 @@ public class HomepageController implements Initializable {
             }
 
 
-    }
-    
+    }    
     //gather user inputs for bead plate1 form each text fileds 
+   //save the userInputsForBeadPlate in to the list passed in
     private boolean getUserInputforPlate1(List<UserInputForBeadPlate> userInputsForBeadPlate) {
         String samples = numSampleInput1.getText();
         String reps = numReplicaInput1.getText();
@@ -1547,44 +1602,9 @@ public class HomepageController implements Initializable {
         clearLayout();
     }
 
-    private void setUserInputByDefaultBaseOnSizeOfXMLFiles(int size) {
-        if(size == 1){
-            setUserInputForBeadPlate1();
-        }
-        if(size  == 2)
-        {
-                setUserInputForBeadPlate1();
-                if(!beadPlate2Tab.isDisabled()) setUserInputForBeadPlate2();
-        }
-        if(size == 3)
-        {
-                clearUserInputForBeadPlate1();
-               if(!beadPlate2Tab.isDisabled())  setUserInputForBeadPlate2();     
-                if(!beadPlate3Tab.isDisabled()) setUserInputForBeadPlate3();   
-        }
-    }
+  
 
-    private void setUserInputForBeadPlate1() {
-        numSampleInput1.setText("2");
-        numReplicaInput1.setText("2");
-        numProbeInput1.setText("10");
-        sampleNamesInput1.setText("WK,WC,HK,HC");
-        
-    }
-
-    private void setUserInputForBeadPlate2() {
-        numSampleInput2.setText("2");
-        numReplicaInput2.setText("2");
-        numProbeInput2.setText("10");
-        sampleNamesInput2.setText("WK,WC,HK,HC");
-    }
-
-    private void setUserInputForBeadPlate3() {
-        numSampleInput3.setText("2");
-        numReplicaInput3.setText("2");
-        numProbeInput3.setText("10");
-        sampleNamesInput3.setText("WK,WC,HK,HC");
-    }
+ 
 }
 
 

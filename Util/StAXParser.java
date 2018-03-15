@@ -79,8 +79,8 @@ ObservableList<bead> beads = FXCollections.observableArrayList();
   return beads;
  }
 
-
-public  HashMap<Integer, HashMap<Integer,  Double>> getMedianValueData(String fileName) {
+// read one xml file and get median value data of each bead well
+public HashMap<Integer, HashMap<Integer,  Double>> getMedianValueData(String fileName) {
    //List for 96 wells. 
    HashMap<Integer, HashMap<Integer,  Double>> wells = new HashMap<>();    
    int wellNo = 0;
@@ -154,9 +154,13 @@ public  HashMap<Integer, List<Integer>> processDataText(HashMap<Integer, List<In
     String[] numbers = null;
     int region = 0;
     int reporter =0;
+    int doublet =0; 
     for(String line : entries)
     {
         numbers = line.split(" "); 
+        doublet = Integer.parseInt(numbers[1]);
+        if(doublet<5000 || doublet>25000)
+            continue;
         region = Integer.parseInt(numbers[0]);
         reporter = Integer.parseInt(numbers[2]);
         if(medianValueDataMap.containsKey(region))

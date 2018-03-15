@@ -83,8 +83,8 @@ public class AddBeadsPageController implements Initializable {
     
         // set experiement bead data into experiement bead table
         curExperiment = ModelForExperiments.getInstance().getCurrentExperiment();
-        curPlate = ModelForExperiments.getInstance().getCurrentPlate();
-        slectedProbes = ModelForExperiments.getInstance().getProbesForOnePlate(curExperiment, curPlate);
+        curPlate = ModelForExperiments.getInstance().getCurPlate();
+        slectedProbes = ModelForExperiments.getInstance().getProbeListForPopulate(curExperiment, curPlate);
         probeSize = slectedProbes.size();
         experimentProbeNoCol.setCellValueFactory(new PropertyValueFactory<probeTableData,Integer>("probeCount"));
         experimentProbeNameCol.setCellValueFactory(new PropertyValueFactory<probeTableData,String>("probeForPlate"));
