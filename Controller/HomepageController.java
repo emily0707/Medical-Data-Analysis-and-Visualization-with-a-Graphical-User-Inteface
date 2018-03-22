@@ -15,6 +15,7 @@ import Util.ErrorMsg;
 import com.jfoenix.controls.JFXButton;
 import java.awt.Color;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.net.MalformedURLException;
@@ -26,6 +27,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
@@ -208,6 +211,7 @@ public class HomepageController implements Initializable {
     @FXML
     private JFXButton loadProbe3;    
     private ObservableList<probeTableData> probes3 = FXCollections.observableArrayList();
+    ObservableList<probeTableData> probesToLoad3 = FXCollections.observableArrayList();
     
     //bead plate set up status table
     @FXML
@@ -219,9 +223,6 @@ public class HomepageController implements Initializable {
     private  ObservableList<PlateStatus> status = FXCollections.observableArrayList();
     
 
-// analyze   
-    @FXML
-    private JFXButton analyze;
     @FXML
     private AnchorPane exp2AP;
     @FXML
@@ -230,27 +231,41 @@ public class HomepageController implements Initializable {
     private Text plate3Text;
 
     //default data to user Input area 
-    String namesInput = "WK,WC,HK,HC";
+    String namesInput = "WC, WK, KC, KK";
     String[] names = namesInput.split(",");
     UserInputForBeadPlate defaultUserInput = new UserInputForBeadPlate(4, 2, namesInput, names,10, new ArrayList<String>());
+    @FXML
+    private Button experimentType1;
+    @FXML
+    private Button experimentType2;
 
 
         
     @Override
-    public void initialize(URL url, ResourceBundle rb) {      
+    public void initialize(URL url, ResourceBundle rb)   {      
 
-        //HashMap<Integer, List<UserInputForBeadPlate>> userInputsForBeadPlateMap= new HashMap<>(); 
-        //initilize probe to load for probe table 1
-        String[] probesList1 = {"Fyn","PSD95","NMDAR1","NMDAR2A","NMDAR2B","mGluR5","Shank3","Homer1","Homer1a","PI3K"};
-        for(int i = 1; i <= probesList1.length; i++)
-        {
-            probesToLoad1.add(new probeTableData(i, probesList1[i-1]));
+        List<List<String>> probeLists = null;
+        try {
+            probeLists = ModelForExperiments.getInstance().getProbesForExperimentType1();
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(HomepageController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        String[] probesList2 = {"GluR1","GluR2","SynGAP","SAP97","NLGN3","Ube3a","CamKII","SAPAP","panSHANK","Shank1"};
-        for(int i = 1; i <= probesList2.length; i++)
+        for(int i = 0; i < probeLists.size(); i++)
         {
-            probesToLoad2.add(new probeTableData(i, probesList2[i-1]));
+            List<String> probesForOneTable = probeLists.get(i);
+
+            for(int j = 1; j <= probesForOneTable.size();j++)
+                {
+                    if(i==0)
+                         probesToLoad1.add(new probeTableData(j, probesForOneTable.get(j-1)));
+                    if(i==1)
+                         probesToLoad2.add(new probeTableData(j, probesForOneTable.get(j-1)));
+                    if(i==2)
+                         probesToLoad3.add(new probeTableData(j, probesForOneTable.get(j-1)));
+                }            
+
         }
+
         
         //poplulate files list 
         if(ModelForExperiments.getInstance().getXMLFiles()!=null && !ModelForExperiments.getInstance().getXMLFiles().isEmpty() )
@@ -343,8 +358,10 @@ public class HomepageController implements Initializable {
                 }
         }
         );
+        probeTable1.setEditable(true);
+        BeadPlate1ProbeCol.setCellFactory(TextFieldTableCell.forTableColumn());
 
-
+    //table.getColumns().addAll(firstNameCol, lastNameCol, emailCol);
 
          //set beads data into bead plate 2 probe List table. 
         ProbeCol2.setCellValueFactory(new PropertyValueFactory<probeTableData,Integer>("probeCount"));
@@ -1261,9 +1278,6 @@ public class HomepageController implements Initializable {
 }
     
 
-    @FXML
-    private void analyzeEvent(ActionEvent event) {
-    }
 
 
 
@@ -1600,6 +1614,12 @@ public class HomepageController implements Initializable {
 
     private void clearLayout1Event(ActionEvent event) {
         clearLayout();
+    }
+
+    @FXML
+    private void editProbeCellEvent(CellEditEvent<probeTableData, String> edittedCell) {
+        probeTableData probeSelected = probeTable1.getSelectionModel().getSelectedItem();
+        probeSelected.setProbeForPlate(edittedCell.getNewValue().toString());
     }
 
   

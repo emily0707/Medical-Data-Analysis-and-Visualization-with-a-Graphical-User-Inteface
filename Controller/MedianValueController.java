@@ -6,7 +6,6 @@
 package Controller;
 
 import Model.ModelForExperiments;
-import Model.ModelForMedianValue;
 import Model.UserInputForBeadPlate;
 import Model.bead;
 import Model.probeTableData;
@@ -151,7 +150,7 @@ public class MedianValueController implements Initializable {
         ColumnConstraints column = new ColumnConstraints(100);
         gridPane.getColumnConstraints().add(column);        
         Label label = new Label();
-        String s = "  " + samplesNames[i-1];
+        String s = "Sample  " + i;
         label.setText(s);    
         label.autosize();
         //add them to the GridPane
@@ -195,7 +194,6 @@ public class MedianValueController implements Initializable {
       UserInputForBeadPlate input = ModelForExperiments.getInstance().getUserInputsForBeadPlateMap().get(curExperiment).get(0); // get the user input for 1st plate
       String[] names = input.getNames();
       sampleName.setText(names[curSample -1]); // show sample name for the median value table        
-       
         //diaply analyte information on the 1st colomn
         analytes = ModelForExperiments.getInstance().getAnalytes();
         for(int i = 1; i <= analytes.size();i++)
@@ -295,6 +293,7 @@ public class MedianValueController implements Initializable {
             platesGridPane.setColumnIndex(label,probeIndex);
             double medianValue = finalMedianValueForOneProbe.get(analytes.get(i-1).getRegionNumber());
             label.setText(Double.toString(medianValue));   
+            colorCode(label,medianValue);
             //set the following three index for pop up page
             //analyteIndex = i-1;
             //when users click the median value, pops up a new page to diaplay other information 
@@ -351,12 +350,13 @@ public class MedianValueController implements Initializable {
     List<String> absolutePath = new ArrayList<>();
     List<HashMap<Integer, HashMap<Integer,  Double>>> meidanValueData = new ArrayList<>();
     StAXParser parser = new StAXParser();
-    for(int i = files.size()-1 ; i >=0; i--) // the sequence should be backwards
+   // for(int i = files.size()-1 ; i >=0; i--) // the sequence should be backwards
+    for(int i = 0 ; i < files.size(); i++) 
     {
        absolutePath.add(directory + "\\" + files.get(i) );   
      }
     
-    for(int i = 0 ; i < absolutePath.size();i++)
+    for(int i = 0 ; i < absolutePath.size();i++) // 
     {
         meidanValueData.add(parser.getMedianValueData(absolutePath.get(i)));
     }
@@ -482,6 +482,7 @@ public class MedianValueController implements Initializable {
         for(int i = 1; i <=experiments;i++)
         {
             List<HashMap<Integer, HashMap<Integer,  Double>>> medianValueOriginalData = getMeidanValueOriginalData(i);
+            
             HashMap<Integer, ObservableList<probeTableData>> probesListForCurExperiment = ModelForExperiments.getInstance().getProbeMapForPopulate().get(i); 
             List<UserInputForBeadPlate> inputs =  ModelForExperiments.getInstance().getUserInputsForBeadPlateMap().get(i);
             int numberOfPlates = inputs.size();
@@ -527,7 +528,7 @@ public class MedianValueController implements Initializable {
         int probePos = probeIndex;
         int samplePos = sampleIndex+1;
         int prevWells = probePos *(numberOfSamples * numberOfReplicas); // previous wells to get right number of wells to start
-        List< HashMap<Integer,  Double>>  wellsForCalculate = new ArrayList<>();
+        List< HashMap<Integer,  Double>>  wellsForCalculate = new ArrayList<>(); // wells that used for calcalute final meidan value 
         samplePos = prevWells + samplePos; //  well of sample
         int wellNo = getWellNoInXmlFiles(samplePos);
         wellsForCalculate.add(dataMap.get(wellNo));
@@ -537,10 +538,39 @@ public class MedianValueController implements Initializable {
             wellNo = getWellNoInXmlFiles(replicaPos);
             wellsForCalculate.add(dataMap.get(wellNo)); // well of relicas 
         }
+        
+        ModelForExperiments.getInstance().setOneProbeDataForMedianValueOriginalData(experimentPos, plateIndex, sampleIndex, wellsForCalculate);
         finalMedianValueForOneProbe = calculateMedianValue(wellsForCalculate); // get final median value data 
         //System.out.println("curExperiment is " + curExperiment + ". curSample is " + curSample + ". cur plate is " + platePos + ". cur Probe is " + probePos);
-
         return finalMedianValueForOneProbe;
+    }
+    
+    /*
+    ii.	Gradually increase the shades of color 
+1.	100-200
+2.	200-1000
+3.	1000-5000
+4.	5000+
+
+    */
+
+    private void colorCode(Label label, double medianValue) {
+        if(medianValue >100 && medianValue<200)
+        {
+            label.setStyle(" -fx-background-color: rgb(255,207,171);");
+        }
+        else if(medianValue >=200 && medianValue<1000)
+        {
+            label.setStyle(" -fx-background-color: rgb(252,137,172);");
+        }
+        else if(medianValue >=1000 && medianValue<5000)
+        {
+            label.setStyle(" -fx-background-color: rgb(238,32,77);");
+        }
+        else if(medianValue >=5000)
+        {
+            label.setStyle(" -fx-background-color: rgb(202,55,103);");
+        }
     }
 }
 

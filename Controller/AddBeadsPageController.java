@@ -11,9 +11,15 @@ import Model.bead;
 import Model.ModelForProbeTabe;
 import Model.probeTableData;
 import Util.ErrorMsg;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Scanner;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -25,6 +31,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -69,14 +76,26 @@ public class AddBeadsPageController implements Initializable {
     int curExperiment;
     int curPlate;
     int probeSize;
+    @FXML
+    private AnchorPane addBeadsPage;
+    @FXML
+    private Button saveProbeChange;
+    @FXML
+    private Button uploadATxtFile;
+    @FXML
+    private TextField inputNo;
+    @FXML
+    private TextField inputPorbeName;
+    @FXML
+    private Button addAProbe;
 
 
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
        
+        
         probes = ModelForExperiments.getInstance().getProbesForLoad();
-
         probeNoCol.setCellValueFactory(new PropertyValueFactory<probeTableData,Integer>("probeCount"));
         probeNameCol.setCellValueFactory(new PropertyValueFactory<probeTableData,String>("probeForPlate"));
         probeTable.setItems(probes);
@@ -86,6 +105,7 @@ public class AddBeadsPageController implements Initializable {
         curPlate = ModelForExperiments.getInstance().getCurPlate();
         slectedProbes = ModelForExperiments.getInstance().getProbeListForPopulate(curExperiment, curPlate);
         probeSize = slectedProbes.size();
+        
         experimentProbeNoCol.setCellValueFactory(new PropertyValueFactory<probeTableData,Integer>("probeCount"));
         experimentProbeNameCol.setCellValueFactory(new PropertyValueFactory<probeTableData,String>("probeForPlate"));
         experimentProbeTable.setItems(slectedProbes);
@@ -189,6 +209,74 @@ public class AddBeadsPageController implements Initializable {
             ModelForExperiments.getInstance().setProbeListForOnePlate(curExperiment, curPlate, slectedProbes);   
         }
         experimentProbeTable.refresh();        
+    }
+
+    @FXML
+    private void saveProbeChangeEvent(ActionEvent event) throws FileNotFoundException, IOException {
+        
+        String newProbes = "";
+        for(probeTableData probe : slectedProbes)
+        {
+            newProbes += probe.getProbeForPlate() + ",";
+        }
+        newProbes = newProbes.substring(0, newProbes.length()-1); // get rid of the last ","
+                
+        File file =new File("C:\\Users\\feiping\\Documents\\NetBeansProjects\\JavaFXApplication1\\src\\Controller\\probes1.txt");
+        Scanner sc = new Scanner(file); 
+        int index =1;
+        String oldProbes = "";
+        String lineToBeReplaced = ""; 
+        while (sc.hasNextLine())
+        {
+            String str = sc.nextLine() + "\r\n";
+            oldProbes += str  ;
+            if(index == curPlate)
+            {
+                lineToBeReplaced=str;
+            }
+            index++;
+        }
+        sc.close();
+        
+        String newtext = oldProbes.replaceAll(lineToBeReplaced, newProbes);
+        
+        FileWriter writer = new FileWriter("C:\\Users\\feiping\\Documents\\NetBeansProjects\\JavaFXApplication1\\src\\Controller\\probes1.txt");
+        writer.write(newtext);
+        writer.close();
+        
+        // feedback for user
+        ErrorMsg error = new ErrorMsg();
+        error.showError("new probes are saved!");
+    }
+
+    @FXML
+    private void uploadATxtFileEvent(ActionEvent event) {
+    }
+
+    @FXML
+    private void addAProbeAction(ActionEvent event) {
+        int no = Integer.parseInt(inputNo.getText());
+       if(no >= probeSize)
+       {
+            ErrorMsg error = new ErrorMsg();
+            error.showError("the Max probe allowed for experiment " + curExperiment + " plate" + curPlate + " is " + probeSize);
+       }  
+
+       String probe = inputPorbeName.getText();
+       for(int i = 0; i <slectedProbes.size();i++ ) // replace the probe name is the no alreadly exist in the list. 
+       {
+           if(slectedProbes.get(i).getProbeCount()==no)
+           {
+               slectedProbes.get(i).setProbeForPlate(probe);
+               experimentProbeTable.refresh();   
+               return;
+           }
+       }
+       // if no is not exist in the list, add to the list. 
+        slectedProbes.add(new probeTableData(no, probe));
+        inputNo.clear();
+        inputPorbeName.clear(); 
+        
     }
 
 

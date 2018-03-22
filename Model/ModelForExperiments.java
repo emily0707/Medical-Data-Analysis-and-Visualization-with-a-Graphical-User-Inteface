@@ -2,12 +2,17 @@ package Model;
 
 
 import Util.ErrorMsg;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import Model.UserInputForBeadPlate;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -21,9 +26,15 @@ import javafx.collections.ObservableList;
  * @author feiping
  */
 public class ModelForExperiments {
+    
+    //defalut probes to two types of experiment. put them in the model so that user can save the change for future experiments. 
+    List<List<String>> ProbesForExperimentType1 = new ArrayList<>();
+    //List<List<String>> defaultProbesForExperimentType2 = new ArrayList<>();
+    
+    
     private ObservableList<bead> analytes = FXCollections.observableArrayList();
     //initial probes list
-   private ObservableList<probeTableData> probesToLoad = FXCollections.observableArrayList();
+    private ObservableList<probeTableData> probesToLoad = FXCollections.observableArrayList();
     // private final static Context instance = new Context();
     private final static ModelForExperiments instance = new ModelForExperiments();
     //probe data contains both bead class number(region number ) and analyte name.
@@ -59,6 +70,12 @@ public class ModelForExperiments {
     Analyte2
     */
     HashMap<Integer, List<List<List<HashMap<Integer,Double>>>>> meidanValueMatrix = new HashMap<>();
+    
+    // has orginal median value data for each wells. 
+    //List<HashMap<Integer,Double>> contains orignal meidan value data of each wells 
+    HashMap<Integer, List<List<List<List<HashMap<Integer,Double>>>>>> medianValueOriginalData = new HashMap<>(); 
+    //HashMap<Integer,  List<HashMap<Integer, HashMap<Integer,  Double>>>> medianValueOriginalData = new HashMap<>(); 
+  
      // pass analyte, curPlate, curProbe when user click one meidan value to open a pop up page.
     private bead curAnalyte;
     private int curPlate =0;
@@ -72,6 +89,28 @@ public class ModelForExperiments {
         return instance;
     }
 
+    // read data from probes1.txt and save it into the ProbesForExperimentType1 list. 
+    public void initializeProbesForExperimentType1() throws FileNotFoundException
+    {
+            // pass the path to the file as a parameter
+        File file =new File("C:\\Users\\feiping\\Documents\\NetBeansProjects\\JavaFXApplication1\\src\\Controller\\probes1.txt");
+        Scanner sc = new Scanner(file); 
+        while (sc.hasNextLine())
+        {
+            String str = sc.nextLine();
+            List<String> probeList = Arrays.asList(str.split(","));
+            ProbesForExperimentType1.add(probeList);
+        }
+        sc.close();
+    }
+    
+    public List<List<String>>  getProbesForExperimentType1() throws FileNotFoundException
+    {
+        if(ProbesForExperimentType1.isEmpty())
+            initializeProbesForExperimentType1();
+        return ProbesForExperimentType1;
+    }
+            
     public void setDirectory(String  directory)
     {
         this.directory = directory;
@@ -356,6 +395,54 @@ public class ModelForExperiments {
         return meidanValueMatrix.get(experimentPos).get(plateIndex).get(sampleIndex).get(probeIndex);
     }
 
+    
+    public HashMap<Integer, List<List<List<List<HashMap<Integer,Double>>>>>> getMedianValueOriginalData ()
+    {
+        return medianValueOriginalData;
+    }
+    
+    public void setMedianValueOriginalData(HashMap<Integer, List<List<List<List<HashMap<Integer,Double>>>>>> medianValueOriginalData)
+    {
+        this.medianValueOriginalData = medianValueOriginalData;
+    }   
+
+    //experiment starts from 1, sampleIndex, PlateIndex, probeIndex start from 0
+    public  void setOneProbeDataForMedianValueOriginalData(int experimentPos, int plateIndex,  int sampleIndex, 
+                         List< HashMap<Integer,  Double>>  OriginalDataForOneProbe)
+    {
+        //    HashMap<Integer, List<List<List<List<HashMap<Integer,Double>>>>>> medianValueOriginalData = new HashMap<>(); 
+        // when median value matrix is empty, initialize it. 
+        if(medianValueOriginalData.isEmpty() || !medianValueOriginalData.containsKey(experimentPos))
+        {
+            List<List<List<List<HashMap<Integer,Double>>>>> experiment= new ArrayList<>();
+            medianValueOriginalData.put(experimentPos, experiment);
+        }
+        if(medianValueOriginalData.get(experimentPos).isEmpty() || medianValueOriginalData.get(experimentPos).size() < (plateIndex+1))
+        {
+            List<List<List<HashMap<Integer,Double>>>> plate = new ArrayList<>();
+            medianValueOriginalData.get(experimentPos).add(plate);
+        }
+        if(medianValueOriginalData.get(experimentPos).get(plateIndex).isEmpty() || 
+                medianValueOriginalData.get(experimentPos).get(plateIndex).size() < (sampleIndex+1))
+        {
+            List<List<HashMap<Integer,Double>>> sample = new ArrayList<>();
+            medianValueOriginalData.get(experimentPos).get(plateIndex).add(sample);
+        }
+        /*
+        if(medianValueOriginalData.get(experimentPos).get(plateIndex).get(sampleIndex).isEmpty() ||
+           medianValueOriginalData.get(experimentPos).get(plateIndex).get(sampleIndex).size() < (probeIndex +1 ) )
+        {
+            List<HashMap<Integer,Double>> probe = new ArrayList<>();
+            medianValueOriginalData.get(experimentPos).get(plateIndex).get(sampleIndex).add(probe);
+        }*/
+        //sample starts from 1. sampleIndex = sample -1;  //plate starts from 1. plateIndex = plate -1;
+        medianValueOriginalData.get(experimentPos).get(plateIndex).get(sampleIndex).add(OriginalDataForOneProbe);
+    }   
+    
+    public List< HashMap<Integer,  Double>> getOneProbeDataForOrignalMedianValue(int experimentPos, int plateIndex,  int sampleIndex, int probeIndex)
+    {
+        return medianValueOriginalData.get(experimentPos).get(plateIndex).get(sampleIndex).get(probeIndex);
+    }    
     
     public bead getCurAnalyte()
     {
