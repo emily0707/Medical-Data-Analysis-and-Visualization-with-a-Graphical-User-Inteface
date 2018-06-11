@@ -96,9 +96,9 @@ public class MedianValueController implements Initializable {
          
         experiments = ModelForExperiments.getInstance().getNumberOfExperiments();
         samples = getLargestSampleCountForAllExperiment();  
+       
         analytes = ModelForExperiments.getInstance().getAnalytes();
         calcaluateMedianValueMatrix();
-        ModelForExperiments.getInstance().getMedianValueMatrix();//for debug
         tableRow(experiments);    
         tableCol(samples);
         fillRadioButton();
@@ -323,7 +323,7 @@ public class MedianValueController implements Initializable {
         
     //helper function : calculate final median value for one Probe.
     private  HashMap<Integer, Double>  calculateMedianValue(List<HashMap<Integer, Double>> wellsForCalculate) {
-        
+      
         HashMap<Integer, Double> finalMedianValueForOneProbe = new HashMap<>();
         for(int i = 0; i < analytes.size();i++)
         {
@@ -358,7 +358,7 @@ public class MedianValueController implements Initializable {
     
     for(int i = 0 ; i < absolutePath.size();i++) // 
     {
-        meidanValueData.add(parser.getMedianValueData(absolutePath.get(i)));
+        meidanValueData.add(parser.getMedianValueData(absolutePath.get(i), experimentPos, i));
     }
      return meidanValueData;    
 }    
@@ -416,6 +416,8 @@ public class MedianValueController implements Initializable {
             mapOfSamples.put(i, samplesCountForOneExperiment);
         }
         samplesNames = userInputsForBeadPlateMap.get(iIndex).get(jIndex).getNames(); 
+        ModelForExperiments.getInstance().setLargestSampleCount(res);
+        ModelForExperiments.getInstance().setMapOfSamplesNumbers(mapOfSamples);
         return res;
     }
 
@@ -429,27 +431,7 @@ public class MedianValueController implements Initializable {
          return res;       
     }
     
-    public void initilizeFakeData()
-    {
-        samples = 20;
-        experiments = 5;
-                List<Integer> samplesCount = new ArrayList<>();
-        samplesCount.add(1);samplesCount.add(2);
-        mapOfSamples.put(1, samplesCount);
-         
-          mapOfSamples.put(3, samplesCount);
-           mapOfSamples.put(4, samplesCount);
-            mapOfSamples.put(5, samplesCount);
-             List<Integer> samplesCount1 = new ArrayList<>();
-            samplesCount1.add(3);
-            mapOfSamples.put(2, samplesCount1);
-                    mapOfSamples.put(1, samplesCount);
-         
-          mapOfSamples.put(6, samplesCount);
-           mapOfSamples.put(7, samplesCount);
-            mapOfSamples.put(8, samplesCount);
-            
-    }
+
 
     // open pop up page to dispaly other values 
     // analytePos starts from 1, platePos starts from 1, probePos starts from 0. 
@@ -479,6 +461,8 @@ public class MedianValueController implements Initializable {
     }
 
     private void calcaluateMedianValueMatrix() {
+         if(!ModelForExperiments.getInstance().getMedianValueMatrix().isEmpty()) return;
+          
         for(int i = 1; i <=experiments;i++)
         {
             List<HashMap<Integer, HashMap<Integer,  Double>>> medianValueOriginalData = getMeidanValueOriginalData(i);

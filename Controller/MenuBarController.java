@@ -77,7 +77,7 @@ public class MenuBarController implements Initializable{
             .text("Fold Change")
             .onAction(new EventHandler<ActionEvent>(){
                 @Override public void handle(ActionEvent t) {
-                    switchToMedianValue() ;
+                    switchToFoldChange() ;
              } 
 
 
@@ -90,7 +90,7 @@ public class MenuBarController implements Initializable{
             .text("ANC")
             .onAction(new EventHandler<ActionEvent>(){
                 @Override public void handle(ActionEvent t) {
-                    switchToMedianValue() ;
+                    switchToANC() ;
              } 
 
 
@@ -129,7 +129,7 @@ public class MenuBarController implements Initializable{
             .text("NED")
             .onAction(new EventHandler<ActionEvent>(){
                 @Override public void handle(ActionEvent t) {
-                    switchToMedianValue() ;
+                   switchToMedianValue() ;
              } 
 
 
@@ -176,4 +176,36 @@ public class MenuBarController implements Initializable{
           e.printStackTrace();
         }
     }
+    
+        private void switchToFoldChange() {
+
+        try {
+
+        URL paneTwoUrl = getClass().getResource("/View/FoldChange.fxml");
+        AnchorPane paneTwo = FXMLLoader.load( paneTwoUrl );
+
+        BorderPane border = Main.getRoot();
+        border.setCenter(paneTwo);
+
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+    }
+        
+        private void switchToANC() {
+
+        try {
+
+        URL paneTwoUrl = getClass().getResource("/View/ANC.fxml");
+        AnchorPane paneTwo = FXMLLoader.load( paneTwoUrl );
+
+        BorderPane border = Main.getRoot();
+        border.setCenter(paneTwo);
+
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+    }     
+        
+        
 }

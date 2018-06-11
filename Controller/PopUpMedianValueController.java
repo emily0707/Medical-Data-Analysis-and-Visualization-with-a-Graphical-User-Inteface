@@ -102,16 +102,16 @@ public class PopUpMedianValueController implements Initializable {
          }
         return medianValueGridPane;
         }
-
-
-    public  GridPane tableCol( int col){
+    
+    /*
+  public  GridPane tableCol( int col){
        for(int i=1; i<=col; i++){
-        //set width for cells of the cols100
-        ColumnConstraints column = new ColumnConstraints(200);
+        //set width for cells of the cols150
+        ColumnConstraints column = new ColumnConstraints(150);
         medianValueGridPane.getColumnConstraints().add(column);
         Label label = new Label();
         label.setWrapText(true);
-        label.setMinWidth(100);
+        label.setMinWidth(150);
         String s = "Experiment " + experimentsToShow.get(i-1);
         label.setText(s);    
         //textField.setAlignment(Pos.CENTER);
@@ -161,10 +161,75 @@ public class PopUpMedianValueController implements Initializable {
 
         }       
     }
+    */
+///*
+    public  GridPane tableCol( int col){
+       for(int i=1; i<=col*2; i=i+2){
+        //set width for cells of the cols90
+        ColumnConstraints column = new ColumnConstraints(90);
+        medianValueGridPane.getColumnConstraints().add(column);
+        Label label = new Label();
+        label.setWrapText(true);
+        label.setMinWidth(90);
+        String s = "Experiment " + experimentsToShow.get(i/2);
+        label.setText(s);    
+        //textField.setAlignment(Pos.CENTER);
+        //label.autosize();
+        medianValueGridPane.add(label,i,0);
+        showMedianValue(experimentsToShow.get(i/2), i);
+     }
+    return medianValueGridPane;
+    }
 
+    //experiment starts from 1
+    private void showMedianValue(int experiment, int col) {
+        int analyteRegionNumber = curAnalyte.getRegionNumber();
+        double medianValue =0;
+        String sampleName = "";
+        String orginalData = "";
+        for(int i = 0; i<sampleNames.length; i++)
+        {
+            Label label1 = new Label();
+            Label label2 = new Label();
+            TextField text1 = new TextField();
+            TextField text2 = new TextField();
+            if(ModelForExperiments.getInstance().getMedianValueMatrix().get(experiment).get(plateIndex).size() <= i ||
+                ModelForExperiments.getInstance().getMedianValueMatrix().get(experiment).get(plateIndex).get(i).get(probeIndex)==null    )
+            {
+                break;         
+            }
+            else 
+            {
+                // get final median value for the cell 
+                medianValue = ModelForExperiments.getInstance().getMedianValueMatrix().get(experiment).get(plateIndex).get(i).get(probeIndex).get(analyteRegionNumber);
+                
+                //get sample name, if sample does not exisit, print nothing. 
+                String[] samples = ModelForExperiments.getInstance().getUserInputsForBeadPlateMap().get(experiment).get(plateIndex).getNames();
+                if(samples.length < i+1) 
+                    continue;
+                else 
+                    sampleName = samples[i];
+                
+                //get original median value for each wells
+               orginalData = getOrginalMeidanValue(experiment,plateIndex,i,probeIndex);
+              
+                
+                label1.setText("   " +Double.toString(medianValue) + " " + sampleName  );    
+                label2.setText(orginalData);
+                text1.setText("   " +Double.toString(medianValue) + " " + sampleName );    
+                text2.setText(orginalData);
+         
+            }
+            
+            medianValueGridPane.add(text1,col, i+1);    
+            medianValueGridPane.add(text2,col+1, i+1);    
+
+        }       
+    }
+//*/
     private String getOrginalMeidanValue(int experiment, int plateIndex, int sampleIndex, int probeIndex) {
         String res = "("; 
-        List< HashMap<Integer,  Double>> orignalData= ModelForExperiments.getInstance().getOneProbeDataForOrignalMedianValue(experiment, plateIndex, plateIndex, probeIndex);
+        List< HashMap<Integer,  Double>> orignalData= ModelForExperiments.getInstance().getOneProbeDataForOrignalMedianValue(experiment, plateIndex, sampleIndex, probeIndex);
         for(HashMap<Integer,  Double> well : orignalData)
         {
            res += well.get(curAnalyte.getRegionNumber()) + ", ";

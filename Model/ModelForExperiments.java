@@ -54,7 +54,8 @@ public class ModelForExperiments {
     private String  directory; //absolute  directory of xml files. 
     private ObservableList<Integer> experiments; // for choice box display # of experiments 
     
-    /* Median value Matrix data strucuture explanation.
+    /* Median value page 
+    Median value Matrix data strucuture explanation.
     for each experiment and sample, HashTable<Integer, List<SampleData>> (key: number of experiment; value: list of sample data)
                    sample1  sample2
     experiment 1
@@ -76,6 +77,10 @@ public class ModelForExperiments {
     HashMap<Integer, List<List<List<List<HashMap<Integer,Double>>>>>> medianValueOriginalData = new HashMap<>(); 
     //HashMap<Integer,  List<HashMap<Integer, HashMap<Integer,  Double>>>> medianValueOriginalData = new HashMap<>(); 
   
+    //orgianl data from xml files. HashMap<Integer,List<Integer> contains data from one plate/xml file. List<Integer> are the reporter data from xml file. 
+     HashMap<Integer, List< HashMap<Integer, HashMap<Integer,   List<Integer>>>>> orginalXMLData = new HashMap<>();
+     HashMap<Integer, List<List<List<HashMap<Integer,Double>>>>> ANCMatrix = new HashMap<>();
+   
      // pass analyte, curPlate, curProbe when user click one meidan value to open a pop up page.
     private bead curAnalyte;
     private int curPlate =0;
@@ -84,6 +89,10 @@ public class ModelForExperiments {
     private int numberOfSamples = 0;
     private String[] sampleNames;
     
+    
+    //Fold change Page
+    private int largestSampleCount = 0; // the largest number of sample of all experiments. 
+    private  HashMap<Integer, List<Integer>> mapOfSamplesNumbers = new HashMap<>(); // number of samples for each experiment
     
     public static ModelForExperiments getInstance() {
         return instance;
@@ -493,5 +502,87 @@ public class ModelForExperiments {
     {
         this.sampleNames = sampleNames;
     }
+    public int getLargestSampleCount()
+    {
+        return largestSampleCount;
+    }
+    
+    public void setLargestSampleCount(int largestSampleCount)
+    {
+        this.largestSampleCount = largestSampleCount;
+    }       
+    
+    public  HashMap<Integer, List<Integer>> getMapOfSamplesNumbers()
+    {
+        return mapOfSamplesNumbers;
+    }
+    
+    public void setMapOfSamplesNumbers(HashMap<Integer, List<Integer>> mapOfSamplesNumbers )
+    {
+        this.mapOfSamplesNumbers = mapOfSamplesNumbers;
+    }   
+    
+    public HashMap<Integer, List< HashMap<Integer, HashMap<Integer,   List<Integer>>>>>  getOriginalXMLData()
+    {
+        return orginalXMLData;
+    }
+    
+    public void setOriginalXMLData(HashMap<Integer, List< HashMap<Integer, HashMap<Integer,  List<Integer>>>>>   map)
+    {
+        orginalXMLData = map;
+    }
+    
+    public void setOriginalXMLDataForOnePlate( HashMap<Integer, HashMap<Integer,   List<Integer>>> orginalDataForOnePlate, int experimentPos)
+    {
+        if(orginalXMLData.isEmpty() ||  !orginalXMLData.containsKey(experimentPos))
+        {
+            List< HashMap<Integer, HashMap<Integer,   List<Integer>>>> plate = new ArrayList<>();
+            orginalXMLData.put(experimentPos, plate);
+        }
+            orginalXMLData.get(experimentPos).add(orginalDataForOnePlate);
         
+    }
+    
+    public List< HashMap<Integer, HashMap<Integer,   List<Integer>>>>  getOriginalXMLDataForOneExperiment( int experimentPos)
+    {
+        return orginalXMLData.get(experimentPos);
+    }
+    
+    public HashMap<Integer, List<List<List<HashMap<Integer,Double>>>>>    getANCMatrix()
+    {
+        return ANCMatrix;
+    }   
+    public void setANCMatrix(HashMap<Integer, List<List<List<HashMap<Integer,Double>>>>> ANCMatrix)
+    {
+        this.ANCMatrix = ANCMatrix;
+    }   
+    public  void setOneProbeDataForANC(int experimentPos, int plateIndex,  int sampleIndex,  HashMap<Integer,Double> ANCForOneProbe)
+    {
+        // when median value matrix is empty, initialize it. 
+        if(ANCMatrix.isEmpty() || !ANCMatrix.containsKey(experimentPos) ) 
+        {
+            List<List<List<HashMap<Integer,Double>>>> experiment= new ArrayList<>();
+            ANCMatrix.put(experimentPos, experiment);
+        }
+        if(ANCMatrix.get(experimentPos).isEmpty() || ANCMatrix.get(experimentPos).size() < (plateIndex+1))
+        {
+            List<List<HashMap<Integer,Double>>> plate = new ArrayList<>();
+            ANCMatrix.get(experimentPos).add(plate);
+        }
+        if(ANCMatrix.get(experimentPos).get(plateIndex).isEmpty() || ANCMatrix.get(experimentPos).get(plateIndex).size() < (sampleIndex+1))
+        {
+            List<HashMap<Integer,Double>> sample = new ArrayList<>();
+            ANCMatrix.get(experimentPos).get(plateIndex).add(sample);
+        }
+        //sample starts from 1. sampleIndex = sample -1;  //plate starts from 1. plateIndex = plate -1;
+        ANCMatrix.get(experimentPos).get(plateIndex).get(sampleIndex).add(ANCForOneProbe);
+    }   
+    
+    public HashMap<Integer,Double> getOneProbeDataForANC(int experimentPos, int plateIndex,  int sampleIndex, int probeIndex)
+    {
+        return ANCMatrix.get(experimentPos).get(plateIndex).get(sampleIndex).get(probeIndex);
+    }
+
+    
+    
 }

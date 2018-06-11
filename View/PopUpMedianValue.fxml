@@ -6,9 +6,16 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.PopUpMedianValueController">
+<AnchorPane id="AnchorPane" minHeight="-Infinity" minWidth="-Infinity" prefHeight="380.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller.PopUpMedianValueController">
    <children>
-      <GridPane fx:id="medianValueGridPane" alignment="TOP_CENTER" layoutX="48.0" layoutY="54.0" prefHeight="90.0">
+      <Text layoutX="14.0" layoutY="39.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Values of Analyte                                     " />
+      <Text fx:id="analyteName" fill="#127be4" layoutX="111.0" layoutY="39.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
+      <Text layoutX="249.0" layoutY="39.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Probe" />
+      <Text fx:id="probeName" fill="#127be4" layoutX="288.0" layoutY="39.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
+      <Text layoutX="346.0" layoutY="39.0" strokeType="OUTSIDE" strokeWidth="0.0" text=" in other sample matrixes: " />
+      <Text layoutX="168.0" layoutY="39.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Plate" />
+      <Text fx:id="plateNumber" fill="#127be4" layoutX="204.0" layoutY="39.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
+      <GridPane fx:id="medianValueGridPane" alignment="TOP_CENTER" layoutX="5.0" layoutY="93.0" maxWidth="800.0" prefWidth="1000.0">
         <columnConstraints>
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -19,12 +26,5 @@
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
       </GridPane>
-      <Text layoutX="47.0" layoutY="39.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Values of Analyte                                     " />
-      <Text fx:id="analyteName" fill="#127be4" layoutX="148.0" layoutY="39.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
-      <Text layoutX="272.0" layoutY="39.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Probe" />
-      <Text fx:id="probeName" fill="#127be4" layoutX="309.0" layoutY="39.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
-      <Text layoutX="338.0" layoutY="39.0" strokeType="OUTSIDE" strokeWidth="0.0" text=" in other sample matrixes: " />
-      <Text layoutX="216.0" layoutY="39.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Plate" />
-      <Text fx:id="plateNumber" fill="#127be4" layoutX="245.0" layoutY="39.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
    </children>
 </AnchorPane>

@@ -538,10 +538,6 @@ public class HomepageController implements Initializable {
         beadPlateStatusTable.refresh();
     }
     
-    @FXML
-    private void doneUploadFilesEvent(ActionEvent event) {
-        uploadFiles.setDisable(true);
-    }
 
     @FXML
     private void resetDataEvent(ActionEvent event) {
@@ -878,23 +874,6 @@ public class HomepageController implements Initializable {
         // update bead plate status table 
         initializePlateStatus();
         
-        // update probe list map
-       // ModelForExperiments.getInstance().initilizeProbeListForPopulate();
-        
-        //clear previous user input and layout if any, user needs to submit information again. 
-       // ModelForExperiments.getInstance().getUserInputsForBeadPlateMap().clear(); 
-        
-        //clearUserInput(fileSize);   
-        //clearLayout();
-        
-       // setUserInputByDefaultBaseOnSizeOfXMLFiles(fileSize); 
-        
-        
-        //add experiments to the context and create beadlist for each bead plate, data structure: map
-        //for(int i =0; i<experiments.size();i++)
-       // {
-           // ModelForExperiments.getInstance().addExperiement(Integer.valueOf(count));
-       // }
     }
     
     // helper function :

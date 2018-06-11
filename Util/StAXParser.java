@@ -80,20 +80,23 @@ ObservableList<bead> beads = FXCollections.observableArrayList();
  }
 
 // read one xml file and get median value data of each bead well
-public HashMap<Integer, HashMap<Integer,  Double>> getMedianValueData(String fileName) {
+public HashMap<Integer, HashMap<Integer,  Double>> getMedianValueData(String fileName,int experimentPos, int plateIndex) {
    //List for 96 wells. 
    HashMap<Integer, HashMap<Integer,  Double>> wells = new HashMap<>();    
+   List<HashMap<Integer, List<Integer>>> originalXMLDataForOnePlate = new ArrayList<>();   
+   HashMap<Integer, HashMap<Integer, List<Integer>>> wellsData = new HashMap<>();    
    int wellNo = 0;
-    // a map for one well:  to hold data that belong to each region number . key: region number; value: reporters from xml file. 
+    ObservableList<bead> analytes = ModelForExperiments.getInstance().getAnalytes();
+    /*// a map for one well:  to hold data that belong to each region number . key: region number; value: reporters from xml file. 
     HashMap<Integer, List<Integer>> medianValueDataMap = new HashMap<>();  
     //get analytes and inititiate meidanvalue data map
-    ObservableList<bead> analytes = ModelForExperiments.getInstance().getAnalytes();
+   
     for(bead n : analytes)
     {
         int regionNumber = n.getRegionNumber();
         List<Integer> list = new ArrayList<>();
         medianValueDataMap.put(regionNumber, list);
-    }                
+    }         */       
 
     // start parsing data from the xml file
     XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
@@ -119,13 +122,13 @@ public HashMap<Integer, HashMap<Integer,  Double>> getMedianValueData(String fil
 
                // get median value orignal data data and process data in to a hashtable base on analytes
                if(startElement.getName().getLocalPart().equals("BeadEventData")){      
-                   // clear previous data 
+                   /*// clear previous data 
                    for(bead b : analytes)
                    {
                        medianValueDataMap.get(b.getRegionNumber()).clear();
-                   }
+                   } */
                 String elementText = xmlEventReader.getElementText(); // read the whole block data 
-                processDataText(medianValueDataMap,elementText );                                                        
+                HashMap<Integer, List<Integer>> oneWellData = processDataText( elementText );                                                        
 
                 // after processing one well, calculate median value for each analytes and save it into wells. 
                 while(xmlEventReader.hasNext())
@@ -133,7 +136,10 @@ public HashMap<Integer, HashMap<Integer,  Double>> getMedianValueData(String fil
                       XMLEvent XMLEvent = xmlEventReader.nextEvent();
                       if(XMLEvent.getEventType() == END_ELEMENT)
                       {
-                            wells.put(wellNo, CalculateMedianValue(medianValueDataMap,analytes));
+                            wellsData.put(wellNo, oneWellData);
+                            //originalXMLDataForOnePlate.add(oneWellData);
+                            wells.put(wellNo, CalculateMedianValue(oneWellData,analytes));
+
                             break;                             
                       }
                    }
@@ -143,13 +149,25 @@ public HashMap<Integer, HashMap<Integer,  Double>> getMedianValueData(String fil
     } catch (FileNotFoundException | XMLStreamException e) {
         e.printStackTrace();
     }
+    ModelForExperiments.getInstance().setOriginalXMLDataForOnePlate(wellsData, experimentPos);
     return wells;
 }    
 
 
 //process data text and put it in to a hashtable for later callculate median value        
-public  HashMap<Integer, List<Integer>> processDataText(HashMap<Integer, List<Integer>> medianValueDataMap, String elementText)
+public  HashMap<Integer, List<Integer>> processDataText( String elementText)
 {
+        // a map for one well:  to hold data that belong to each region number . key: region number; value: reporters from xml file. 
+    HashMap<Integer, List<Integer>> well = new HashMap<>();  
+    //get analytes and inititiate meidanvalue data map
+    ObservableList<bead> analytes = ModelForExperiments.getInstance().getAnalytes();
+    for(bead n : analytes)
+    {
+        int regionNumber = n.getRegionNumber();
+        List<Integer> list = new ArrayList<>();
+        well.put(regionNumber, list);
+    }   
+    
     String[] entries = elementText.split("\\r?\\n");                       
     String[] numbers = null;
     int region = 0;
@@ -163,10 +181,10 @@ public  HashMap<Integer, List<Integer>> processDataText(HashMap<Integer, List<In
             continue;
         region = Integer.parseInt(numbers[0]);
         reporter = Integer.parseInt(numbers[2]);
-        if(medianValueDataMap.containsKey(region))
-             medianValueDataMap.get(region).add(reporter);                     
+        if(well.containsKey(region))
+             well.get(region).add(reporter);                     
     }         
-    return medianValueDataMap;
+    return well;
 }
         
 private  HashMap<Integer, Double>  CalculateMedianValue(HashMap<Integer, List<Integer>> medianValueDataMap, ObservableList<bead> analytes) 
